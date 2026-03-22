@@ -6,14 +6,8 @@
 <meta http-equiv="Feature-Policy" content="camera *; microphone *">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><meta name="apple-mobile-web-app-capable" content="yes">
 <title>KIA Design Model Management</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net">
-<link rel="preconnect" href="https://cdnjs.cloudflare.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet"></noscript>
-<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet"></noscript>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 
 
 <style>
@@ -581,7 +575,7 @@ function _gasCall(funcName, args, onSuccess, onFail) {
 var google = { script: { run: null } };
 
 (function() {
-  var funcs = ['login','registerModel','updateLocation','discardModel',
+  var funcs = ['login','registerModel','updateModel','updateLocation','discardModel',
     'getModelByQR','getAllModels','getStats','getAccounts','updateAccounts'];
   
   var base = {
@@ -843,34 +837,42 @@ function onQRSuccess(mode,text) {
         if (res.success && res.model) {
           var m = res.model;
           var _sEl2 = document.getElementById('reg-qr-status');
-          var _msg = m.status === '폐기'
-            ? '⛔ 폐기된 QR코드입니다\n\n다시 스캔하시겠습니까?'
-            : '⛔ 이미 등록된 QR코드입니다\n\n다시 스캔하시겠습니까?';
-          var _label = m.status === '폐기' ? '폐기된 코드' : '중복 코드';
-          if(_sEl2){_sEl2.textContent=_label;_sEl2.className='qr-status error';}
-          scannedQR['register'] = '';
-          showConfirm(_msg, function() {
-            // 예 - 리셋 후 카메라 재시작
+          // 폐기된 코드
+          if (m.status === '폐기') {
+            if(_sEl2){_sEl2.textContent='폐기된 코드';_sEl2.className='qr-status error';}
             scannedQR['register'] = '';
-            var _qrVal = document.getElementById('reg-qr-val');
-            var _qrStat = document.getElementById('reg-qr-status');
-            if(_qrVal) _qrVal.textContent = 'QR 코드를 스캔하세요';
-            if(_qrStat){ _qrStat.textContent='대기중'; _qrStat.className='qr-status waiting'; }
-            var _proj = document.getElementById('reg-project'); if(_proj) _proj.value='';
-            var _comp = document.getElementById('reg-company'); if(_comp) _comp.value='';
-            var _memo = document.getElementById('reg-memo');    if(_memo) _memo.value='';
-            var _date = document.getElementById('reg-date');    if(_date) _date.valueAsDate=new Date();
-            selectedType='EXT';
-            document.querySelectorAll('.type-btn').forEach(function(b){b.classList.remove('selected');});
-            var extBtn = document.querySelector('.type-btn'); if(extBtn) extBtn.classList.add('selected');
-            stopQR('register');
-            setTimeout(function(){ startQR('register','qr-reader'); }, 300);
-          }, function() {
-            // 아니오 - 리셋 후 홈으로
-            scannedQR['register'] = '';
-            stopQR('register');
-            goTo('screen-home');
-          });
+            showConfirm('⛔ 폐기된 QR코드입니다\n\n다시 스캔하시겠습니까?', function() {
+              scannedQR['register'] = '';
+              var _qrVal = document.getElementById('reg-qr-val');
+              var _qrStat = document.getElementById('reg-qr-status');
+              if(_qrVal) _qrVal.textContent = 'QR 코드를 스캔하세요';
+              if(_qrStat){ _qrStat.textContent='대기중'; _qrStat.className='qr-status waiting'; }
+              stopQR('register');
+              setTimeout(function(){ startQR('register','qr-reader'); }, 300);
+            }, function() { scannedQR['register']=''; stopQR('register'); goTo('screen-home'); });
+            return;
+          }
+          // 이미 등록된 코드 → 정보 수정 모드로 전환
+          if(_sEl2){_sEl2.textContent='수정 모드';_sEl2.className='qr-status scanned';}
+          scannedQR['register'] = m.qrId;
+          // 기존 정보 폼에 채우기
+          var _proj = document.getElementById('reg-project'); if(_proj) _proj.value = m.project||'';
+          var _comp = document.getElementById('reg-company'); if(_comp) _comp.value = m.company||'';
+          var _memo = document.getElementById('reg-memo');    if(_memo) _memo.value = m.memo||'';
+          var _date = document.getElementById('reg-date');    if(_date && m.inDate) _date.value = String(m.inDate).split('T')[0];
+          // 타입
+          selectedType = m.type||'EXT';
+          document.querySelectorAll('.type-btn').forEach(function(b){b.classList.remove('selected'); if(b.textContent.trim()===selectedType) b.classList.add('selected');});
+          // 소재
+          selectedMaterial = m.material||'CLAY';
+          document.querySelectorAll('.mat-btn').forEach(function(b){b.classList.remove('selected'); if(b.textContent.trim()===selectedMaterial) b.classList.add('selected');});
+          // 단계
+          selectedStage = m.stage||'SELECTION';
+          document.querySelectorAll('.stage-btn').forEach(function(b){b.classList.remove('selected'); if(b.textContent.trim()===selectedStage) b.classList.add('selected');});
+          // 버튼 텍스트 변경
+          var _regBtn = document.querySelector('#screen-register .submit-btn');
+          if(_regBtn){ _regBtn.textContent='정보 수정'; _regBtn.style.background='#FF9500'; }
+          showToast('📝 기존 등록 정보를 불러왔습니다. 수정 후 저장하세요.');
         }
       })
       .withFailureHandler(function(){})
@@ -1370,7 +1372,13 @@ function submitDiscard() {
 
 function submitRegister() {
   var _regBtn = document.querySelector('#screen-register .submit-btn');
-  if(_regBtn){_regBtn.textContent='등록 중...';_regBtn.disabled=true;_regBtn.classList.add('btn-loading');}
+  var isEditMode = _regBtn && _regBtn.textContent.trim() === '정보 수정';
+
+  if(_regBtn){
+    _regBtn.textContent = isEditMode ? '수정 중...' : '등록 중...';
+    _regBtn.disabled=true;
+    _regBtn.classList.add('btn-loading');
+  }
 
   var qrId    = scannedQR['register'] || (document.getElementById('reg-qr-val') ? document.getElementById('reg-qr-val').textContent.trim() : '');
   var project = document.getElementById('reg-project') ? document.getElementById('reg-project').value.trim() : '';
@@ -1379,10 +1387,38 @@ function submitRegister() {
   var memo    = document.getElementById('reg-memo') ? document.getElementById('reg-memo').value.trim() : '';
 
   function resetBtn() {
-    if(_regBtn){_regBtn.textContent='디자인 모델 등록';_regBtn.disabled=false;_regBtn.classList.remove('btn-loading');}
+    if(isEditMode){
+      if(_regBtn){_regBtn.textContent='정보 수정';_regBtn.disabled=false;_regBtn.classList.remove('btn-loading');_regBtn.style.background='#FF9500';}
+    } else {
+      if(_regBtn){_regBtn.textContent='디자인 모델 등록';_regBtn.disabled=false;_regBtn.classList.remove('btn-loading');_regBtn.style.background='';}
+    }
   }
 
-  if (!qrId || qrId === 'QR 코드를 스캔하세요' || qrId === '디자인 모델 QR 코드를 스캔하세요' || qrId === '') { resetBtn(); showToast('❌ QR 코드를 스캔해주세요'); return; }
+  function resetForm() {
+    stopQR('register');
+    scannedQR['register'] = '';
+    var _qrVal = document.getElementById('reg-qr-val');
+    var _qrStat = document.getElementById('reg-qr-status');
+    if(_qrVal) _qrVal.textContent = 'QR 코드를 스캔하세요';
+    if(_qrStat){ _qrStat.textContent='대기중'; _qrStat.className='qr-status waiting'; }
+    var _proj = document.getElementById('reg-project'); if(_proj) _proj.value='';
+    var _comp = document.getElementById('reg-company'); if(_comp) _comp.value='';
+    var _memo = document.getElementById('reg-memo');    if(_memo) _memo.value='';
+    var _date = document.getElementById('reg-date');    if(_date) _date.valueAsDate=new Date();
+    selectedType='EXT';
+    document.querySelectorAll('.type-btn').forEach(function(b){b.classList.remove('selected');});
+    var extBtn = document.querySelector('.type-btn'); if(extBtn) extBtn.classList.add('selected');
+    selectedMaterial='CLAY';
+    document.querySelectorAll('.mat-btn').forEach(function(b){b.classList.remove('selected');});
+    var clayBtn = document.querySelector('.mat-btn'); if(clayBtn) clayBtn.classList.add('selected');
+    selectedStage='SELECTION';
+    document.querySelectorAll('.stage-btn').forEach(function(b){b.classList.remove('selected');});
+    var selBtn = document.querySelector('.stage-btn'); if(selBtn) selBtn.classList.add('selected');
+    if(_regBtn){_regBtn.textContent='디자인 모델 등록';_regBtn.disabled=false;_regBtn.style.background='';}
+    setTimeout(function(){ startQR('register','qr-reader'); }, 300);
+  }
+
+  if (!qrId || qrId === 'QR 코드를 스캔하세요' || qrId === '') { resetBtn(); showToast('❌ QR 코드를 스캔해주세요'); return; }
   if (!project) { resetBtn(); showToast('❌ 프로젝트명을 입력해주세요'); return; }
   if (!selectedType) { resetBtn(); showToast('❌ 모델 타입을 선택해주세요'); return; }
   if (!selectedMaterial) { resetBtn(); showToast('❌ 소재를 선택해주세요'); return; }
@@ -1390,55 +1426,45 @@ function submitRegister() {
   if (!company) { resetBtn(); showToast('❌ 제작회사를 입력해주세요'); return; }
   if (!date) { resetBtn(); showToast('❌ 품평일자를 선택해주세요'); return; }
 
-  google.script.run
-    .withSuccessHandler(function(res){
-      if(res.success){
-        if(_regBtn){_regBtn.textContent='등록 완료 ✅';_regBtn.classList.remove('btn-loading');}
-        invalidateQRCache();
-        showToast('✅ '+res.message);
-        loadStats();
-        // 등록 완료 후 화면 리셋 - 다음 QR 바로 등록 가능
-        setTimeout(function(){
-          // QR 스캐너 재시작
-          stopQR('register');
-          // 입력값 초기화
-          scannedQR['register'] = '';
-          var _qrVal = document.getElementById('reg-qr-val');
-          var _qrStat = document.getElementById('reg-qr-status');
-          if(_qrVal) _qrVal.textContent = 'QR 코드를 스캔하세요';
-          if(_qrStat){ _qrStat.textContent='대기중'; _qrStat.className='qr-status waiting'; }
-          var _proj = document.getElementById('reg-project'); if(_proj) _proj.value='';
-          var _comp = document.getElementById('reg-company'); if(_comp) _comp.value='';
-          var _memo = document.getElementById('reg-memo');    if(_memo) _memo.value='';
-          var _date = document.getElementById('reg-date');    if(_date) _date.valueAsDate=new Date();
-          // 타입 버튼 EXT로 초기화
-          selectedType='EXT';
-          document.querySelectorAll('.type-btn').forEach(function(b){b.classList.remove('selected');});
-          var extBtn = document.querySelector('.type-btn');
-          if(extBtn) extBtn.classList.add('selected');
-          selectedMaterial='CLAY';
-          document.querySelectorAll('.mat-btn').forEach(function(b){b.classList.remove('selected');});
-          var clayBtn = document.querySelector('.mat-btn');
-          if(clayBtn) clayBtn.classList.add('selected');
-          selectedStage='SELECTION';
-          document.querySelectorAll('.stage-btn').forEach(function(b){b.classList.remove('selected');});
-          var selBtn = document.querySelector('.stage-btn');
-          if(selBtn) selBtn.classList.add('selected');
-          // 버튼 리셋
-          if(_regBtn){_regBtn.textContent='디자인 모델 등록';_regBtn.disabled=false;}
-          // QR 스캐너 다시 시작
-          setTimeout(function(){ startQR('register','qr-reader'); }, 300);
-        }, 1000);
-      } else {
-        resetBtn();
-        showToast('❌ '+(res.message||'등록 실패'));
-      }
-    })
-    .withFailureHandler(function(e){
-      resetBtn();
-      showToast('❌ '+(e&&e.message?e.message:'네트워크 오류'));
-    })
-    .registerModel({qrId:qrId, project:project, stage:selectedStage, type:selectedType, material:selectedMaterial, company:company, date:date, memo:memo});
+  var payload = {qrId:qrId, project:project, stage:selectedStage, type:selectedType, material:selectedMaterial, company:company, date:date, memo:memo};
+
+  if (isEditMode) {
+    // 정보 수정 모드
+    google.script.run
+      .withSuccessHandler(function(res){
+        if(res.success){
+          if(_regBtn){_regBtn.textContent='수정 완료 ✅';_regBtn.classList.remove('btn-loading');}
+          invalidateQRCache();
+          // MODELS 캐시 업데이트
+          MODELS = MODELS.map(function(m){ return m.qrId===qrId ? Object.assign({},m,{project:project,stage:selectedStage,type:selectedType,material:selectedMaterial,company:company}) : m; });
+          showToast('✅ 정보가 수정되었습니다');
+          loadStats();
+          setTimeout(function(){ resetForm(); goTo('screen-home'); }, 1000);
+        } else {
+          resetBtn();
+          showToast('❌ '+(res.message||'수정 실패'));
+        }
+      })
+      .withFailureHandler(function(e){ resetBtn(); showToast('❌ '+(e&&e.message?e.message:'수정 오류')); })
+      .updateModel(payload);
+  } else {
+    // 신규 등록 모드
+    google.script.run
+      .withSuccessHandler(function(res){
+        if(res.success){
+          if(_regBtn){_regBtn.textContent='등록 완료 ✅';_regBtn.classList.remove('btn-loading');}
+          invalidateQRCache();
+          showToast('✅ '+res.message);
+          loadStats();
+          setTimeout(function(){ resetForm(); }, 1000);
+        } else {
+          resetBtn();
+          showToast('❌ '+(res.message||'등록 실패'));
+        }
+      })
+      .withFailureHandler(function(e){ resetBtn(); showToast('❌ '+(e&&e.message?e.message:'네트워크 오류')); })
+      .registerModel(payload);
+  }
 }
 
 
