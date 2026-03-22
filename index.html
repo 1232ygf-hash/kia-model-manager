@@ -1565,7 +1565,9 @@ function doDiscardSearch() {
 function renderDiscardResults(models, container) {
   var html2 = '';
   models.forEach(function(m) {
-    var loc = m.location || '미등록';
+    var loc = m.location || '위치 미등록';
+    var stg = m.stage ? '<span class="type-tag" style="background:#E8F0FE;color:#1a73e8;margin-left:4px;">'+m.stage+'</span>' : '';
+    var mat = m.material ? '<span class="type-tag" style="background:#F2F2F7;color:#555;margin-left:4px;">'+m.material+'</span>' : '';
     html2 += '<div id="dc-item-'+m.qrId+'" style="background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:8px;cursor:pointer;border:2px solid var(--line);transition:border-color 0.2s,background 0.2s;" onclick="toggleDiscardSelect(this)"' +
       ' data-qrid="' + m.qrId + '"' +
       ' data-project="' + m.project + '"' +
@@ -1573,11 +1575,16 @@ function renderDiscardResults(models, container) {
       ' data-company="' + m.company + '"' +
       ' data-loc="' + loc + '"' +
       ' data-selected="false">' +
-      '<div style="display:flex;align-items:center;gap:10px;">' +
-      '<div class="dc-chk" style="width:22px;height:22px;border-radius:50%;border:2px solid #ccc;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.2s;"></div>' +
+      '<div style="display:flex;align-items:flex-start;gap:10px;">' +
+      '<div class="dc-chk" style="width:22px;height:22px;border-radius:50%;border:2px solid #ccc;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.2s;margin-top:2px;"></div>' +
       '<div style="flex:1;">' +
-      '<div style="font-size:15px;font-weight:600;">' + m.project + '</div>' +
-      '<div style="font-size:12px;color:var(--sub);margin-top:2px;">' + m.type + ' · ' + m.company + ' · ' + loc + '</div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+      '<div style="font-size:15px;font-weight:700;">' + m.project + '</div>' +
+      '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;"><span class="type-tag '+(m.type||'').toLowerCase()+'">'+(m.type||'')+'</span>'+stg+mat+'</div>' +
+      '</div>' +
+      '<div style="font-size:12px;color:var(--success);font-weight:500;margin-bottom:6px;">📍 ' + loc + '</div>' +
+      '<div style="display:flex;gap:16px;"><div style="font-size:11px;color:var(--sub);">제작사 <span style="color:var(--text);font-weight:500;">' + (m.company||'-') + '</span></div>' +
+      '<div style="font-size:11px;color:var(--sub);">품평일 <span style="color:var(--text);font-weight:500;">' + formatDate(m.inDate) + '</span></div></div>' +
       '</div></div>' +
       '</div>';
   });
