@@ -118,7 +118,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
 .search-bar input{flex:1;background:none;border:none;font-family:'Pretendard',sans-serif;font-size:15px;color:var(--text);outline:none;}
 .search-bar input::placeholder{color:#C7C7CC;}
 .search-bar button{background:var(--text);border:none;border-radius:10px;width:36px;height:36px;color:white;font-size:14px;cursor:pointer;flex-shrink:0;}
-.filter-row{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;}
+.filter-row{display:flex;gap:8px;margin-bottom:8px;overflow-x:auto;padding-bottom:2px;}
 .filter-row::-webkit-scrollbar{display:none;}
 .filter-chip{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:7px 16px;font-size:14px;font-weight:500;color:var(--sub);white-space:nowrap;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;transition:all 0.2s;flex-shrink:0;box-shadow:var(--shadow-sm);-webkit-text-size-adjust:none;text-size-adjust:none;}
 .filter-chip.active{background:var(--text);border-color:var(--text);color:white;}
@@ -344,30 +344,20 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
     <div class="qr-scanner-area"><div id="qr-reader-loc"></div>
       <div class="qr-info-bar"><span class="qr-id" id="loc-qr-val">모델 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="loc-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
     </div>
-    <div id="loc-model-info" style="display:none;margin:12px 0;background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);">
-      <div style="padding:10px 20px;background:var(--fill);border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--sub);">모델 정보</div>
-      <div style="padding:14px 16px;">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;">
-          <div style="text-align:center;background:var(--fill);border-radius:10px;padding:8px 4px;">
-            <div style="font-size:10px;color:var(--sub);margin-bottom:4px;">프로젝트명</div>
-            <div id="loc-m-project" style="font-size:12px;font-weight:700;word-break:break-all;line-height:1.3;"></div>
-          </div>
-          <div style="text-align:center;background:var(--fill);border-radius:10px;padding:8px 4px;">
-            <div style="font-size:10px;color:var(--sub);margin-bottom:4px;">프로젝트 단계</div>
-            <div id="loc-m-stage" style="font-size:13px;font-weight:700;color:#1a73e8;"></div>
-          </div>
-          <div style="text-align:center;background:var(--fill);border-radius:10px;padding:8px 4px;">
-            <div style="font-size:10px;color:var(--sub);margin-bottom:4px;">타입</div>
-            <div id="loc-m-type" style="font-size:13px;font-weight:700;"></div>
-          </div>
-          <div style="text-align:center;background:var(--fill);border-radius:10px;padding:8px 4px;">
-            <div style="font-size:10px;color:var(--sub);margin-bottom:4px;">소재</div>
-            <div id="loc-m-material" style="font-size:13px;font-weight:700;"></div>
+    <div id="loc-model-info" style="display:none;margin:12px 16px 0;">
+      <div class="model-card" style="cursor:default;">
+        <div class="card-top">
+          <div class="model-name" id="loc-m-project"></div>
+          <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
+            <span id="loc-m-type-tag" class="type-tag ext"></span>
+            <span id="loc-m-stage-tag" class="type-tag" style="background:#E8F0FE;color:#1a73e8;margin-left:4px;"></span>
+            <span id="loc-m-material-tag" class="type-tag" style="background:#F2F2F7;color:#555;margin-left:4px;"></span>
           </div>
         </div>
-        <div style="background:var(--fill);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;">
-          <div style="font-size:11px;color:var(--sub);white-space:nowrap;">현재위치</div>
-          <div id="loc-m-loc" style="font-size:13px;font-weight:600;color:var(--sub);"></div>
+        <div class="location-row" id="loc-m-loc">📍 미등록</div>
+        <div class="meta-row">
+          <div class="meta-item">제작사 <span id="loc-m-company">-</span></div>
+          <div class="meta-item">품평일 <span id="loc-m-indate">-</span></div>
         </div>
       </div>
     </div>
@@ -462,8 +452,8 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
         <button class="filter-chip" onclick="setFilter(this,'int')">INT</button>
         <button class="filter-chip" onclick="setFilter(this,'zone')">구역별 현황</button>
       </div>
+      <div id="count-bar" style="display:none;padding:0 4px 4px;"></div>
     </div>
-    <div id="count-bar" style="display:none;padding:0 16px 8px;"></div>
     <div class="model-list" id="model-list-view">
       <div style="text-align:center;padding:48px 20px;color:#C7C7CC;font-size:14px;"><div style="font-size:40px;margin-bottom:12px;">📭</div>등록된 모델이 없습니다</div>
     </div>
@@ -726,7 +716,28 @@ function startQR(mode, elementId) {
     config,
     qrCodeSuccessCallback
   ).catch(function(err) {
-    showToast('📷 카메라를 열 수 없습니다: ' + err);
+    // 실패 시 반대 카메라로 자동 재시도
+    var prevFacing = cameraFacing;
+    cameraFacing = (cameraFacing === 'environment') ? 'user' : 'environment';
+    var flipBtns = document.querySelectorAll('.camera-flip-btn');
+    flipBtns.forEach(function(btn) {
+      btn.textContent = cameraFacing === 'environment' ? '🔄 전면' : '🔄 후면';
+    });
+    delete qrScanners[mode];
+    var html5QrCode2 = new Html5Qrcode(elementId);
+    qrScanners[mode] = html5QrCode2;
+    html5QrCode2.start(
+      { facingMode: cameraFacing },
+      config,
+      qrCodeSuccessCallback
+    ).catch(function(err2) {
+      // 둘 다 실패 시 원래 방향으로 복귀 + 에러 안내
+      cameraFacing = prevFacing;
+      flipBtns.forEach(function(btn) {
+        btn.textContent = cameraFacing === 'environment' ? '🔄 전면' : '🔄 후면';
+      });
+      showToast('📷 카메라를 열 수 없습니다. 다른 앱에서 카메라 사용 중인지 확인해주세요.');
+    });
   });
 }
 
@@ -839,10 +850,17 @@ function onQRSuccess(mode,text) {
           var m = res.model;
           var _e;
           _e=document.getElementById('loc-m-project'); if(_e)_e.textContent=m.project||'-';
-          _e=document.getElementById('loc-m-stage');   if(_e)_e.textContent=m.stage||'-';
-          _e=document.getElementById('loc-m-type');    if(_e)_e.textContent=m.type||'-';
-          _e=document.getElementById('loc-m-material'); if(_e)_e.textContent=m.material||'-';
-          _e=document.getElementById('loc-m-loc');     if(_e)_e.textContent=m.location||'미등록';
+          // 타입 태그
+          _e=document.getElementById('loc-m-type-tag'); if(_e){_e.textContent=m.type||'-';_e.className='type-tag '+(m.type||'').toLowerCase();}
+          // 단계 태그
+          _e=document.getElementById('loc-m-stage-tag'); if(_e)_e.textContent=m.stage||'-';
+          // 소재 태그
+          _e=document.getElementById('loc-m-material-tag'); if(_e)_e.textContent=m.material||'-';
+          // 위치
+          _e=document.getElementById('loc-m-loc'); if(_e)_e.textContent='📍 '+(m.location||'위치 미등록');
+          // 제작사, 품평일
+          _e=document.getElementById('loc-m-company'); if(_e)_e.textContent=m.company||'-';
+          _e=document.getElementById('loc-m-indate'); if(_e)_e.textContent=formatDate(m.inDate);
           if(infoDiv) infoDiv.style.display='block';
         } else {
           if(_locStat){_locStat.textContent='미등록';_locStat.className='qr-status error';}
@@ -1227,9 +1245,9 @@ function setFilter(btn,type) {
       if(cb){
         cb.style.display='block';
         cb.innerHTML='<div style="display:flex;gap:8px;flex-wrap:wrap;">'
-          +'<div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">EXT <span style="color:#007AFF;">'+extCnt+'</span></div>'
-          +'<div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">INT <span style="color:#007AFF;">'+intCnt+'</span></div>'
-          +'<div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">총합 <span style="color:#007AFF;">'+(extCnt+intCnt)+'</span></div>'
+          +'<div class="filter-chip" style="cursor:default;">EXT <span style="color:#007AFF;">'+extCnt+'</span></div>'
+          +'<div class="filter-chip" style="cursor:default;">INT <span style="color:#007AFF;">'+intCnt+'</span></div>'
+          +'<div class="filter-chip" style="cursor:default;">총합 <span style="color:#007AFF;">'+(extCnt+intCnt)+'</span></div>'
           +'</div>';
       }
     } else if(type==='ext'){
@@ -1237,7 +1255,7 @@ function setFilter(btn,type) {
       if(cb){
         cb.style.display='block';
         cb.innerHTML='<div style="display:flex;gap:8px;">'
-          +'<div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">EXT <span style="color:#007AFF;">'+extCnt+'</span></div>'
+          +'<div class="filter-chip" style="cursor:default;">EXT <span style="color:#007AFF;">'+extCnt+'</span></div>'
           +'</div>';
       }
     } else if(type==='int'){
@@ -1245,7 +1263,7 @@ function setFilter(btn,type) {
       if(cb){
         cb.style.display='block';
         cb.innerHTML='<div style="display:flex;gap:8px;">'
-          +'<div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">INT <span style="color:#007AFF;">'+intCnt+'</span></div>'
+          +'<div class="filter-chip" style="cursor:default;">INT <span style="color:#007AFF;">'+intCnt+'</span></div>'
           +'</div>';
       }
     }
@@ -1264,9 +1282,9 @@ function enterSearch(){
     if(cb){
       cb.style.display='block';
       cb.innerHTML='<div style="display:flex;gap:8px;flex-wrap:wrap;">'
-        +'<div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">EXT <span style="color:#007AFF;">'+extCnt+'</span></div>'
-        +'<div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">INT <span style="color:#007AFF;">'+intCnt+'</span></div>'
-        +'<div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">총합 <span style="color:#007AFF;">'+(extCnt+intCnt)+'</span></div>'
+        +'<div class="filter-chip" style="cursor:default;">EXT <span style="color:#007AFF;">'+extCnt+'</span></div>'
+        +'<div class="filter-chip" style="cursor:default;">INT <span style="color:#007AFF;">'+intCnt+'</span></div>'
+        +'<div class="filter-chip" style="cursor:default;">총합 <span style="color:#007AFF;">'+(extCnt+intCnt)+'</span></div>'
         +'</div>';
     }
     // 백그라운드에서 최신 데이터 갱신
@@ -1308,14 +1326,14 @@ function doSearch(silent) {
           cb.style.display='block';
           if(activeType==='all'){
             cb.innerHTML='<div style="display:flex;gap:8px;flex-wrap:wrap;">'
-              +'<div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">EXT <span style="color:#007AFF;">'+extCnt+'</span></div>'
-              +'<div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">INT <span style="color:#007AFF;">'+intCnt+'</span></div>'
-              +'<div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">총합 <span style="color:#007AFF;">'+(extCnt+intCnt)+'</span></div>'
+              +'<div class="filter-chip" style="cursor:default;">EXT <span style="color:#007AFF;">'+extCnt+'</span></div>'
+              +'<div class="filter-chip" style="cursor:default;">INT <span style="color:#007AFF;">'+intCnt+'</span></div>'
+              +'<div class="filter-chip" style="cursor:default;">총합 <span style="color:#007AFF;">'+(extCnt+intCnt)+'</span></div>'
               +'</div>';
           } else if(activeType==='ext'){
-            cb.innerHTML='<div style="display:flex;gap:8px;"><div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">EXT <span style="color:#007AFF;">'+extCnt+'</span></div></div>';
+            cb.innerHTML='<div style="display:flex;gap:8px;"><div class="filter-chip" style="cursor:default;">EXT <span style="color:#007AFF;">'+extCnt+'</span></div></div>';
           } else if(activeType==='int'){
-            cb.innerHTML='<div style="display:flex;gap:8px;"><div style="background:var(--card);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);">INT <span style="color:#007AFF;">'+intCnt+'</span></div></div>';
+            cb.innerHTML='<div style="display:flex;gap:8px;"><div class="filter-chip" style="cursor:default;">INT <span style="color:#007AFF;">'+intCnt+'</span></div></div>';
           }
         }
       } else {
@@ -1352,7 +1370,7 @@ function submitLocation() {
         showToast('📍 '+res.message);
         // 모델 정보 현재위치 업데이트
         var _locEl = document.getElementById('loc-m-loc');
-        if(_locEl) _locEl.textContent = selectedLocation;
+        if(_locEl) _locEl.textContent = '📍 ' + selectedLocation;
         // 1초 후 홈으로 자동 이동
         setTimeout(function(){
           if(_locBtn){_locBtn.textContent='디자인 모델 위치 등록';_locBtn.disabled=false;_locBtn.classList.remove('btn-loading');}
@@ -1947,6 +1965,28 @@ function showLoading(show){document.getElementById('loading-overlay').style.disp
       return;
     }
   } catch(e) {}
+
+  // ────────────────────────────────────────────
+  // 🔍 샘플 미리보기 모드 (GAS 없이 UI 확인용)
+  // ────────────────────────────────────────────
+  MODELS = [
+    {no:1, qrId:'KIA-001', project:'2026_EV9_EXT_A', stage:'SELECTION', type:'EXT', material:'CLAY',     company:'(주)다이나믹',  location:'지하 A ZONE',      inDate:'2026-01-10', status:'보관중'},
+    {no:2, qrId:'KIA-002', project:'2026_EV9_EXT_B', stage:'PROGRESS',  type:'EXT', material:'HARD',     company:'(주)다이나믹',  location:'지하 B ZONE',      inDate:'2026-01-15', status:'보관중'},
+    {no:3, qrId:'KIA-003', project:'2026_EV9_INT_A', stage:'APPROVAL',  type:'INT', material:'CLAY',     company:'(주)모델텍',   location:'메인 스튜디오',     inDate:'2026-02-01', status:'보관중'},
+    {no:4, qrId:'KIA-004', project:'2027_EV6_EXT_A', stage:'APPROVAL',  type:'EXT', material:'HARD',     company:'(주)모델텍',   location:'실내 품평장',       inDate:'2026-02-10', status:'보관중'},
+    {no:5, qrId:'KIA-005', project:'2027_EV6_EXT_B', stage:'FIX',       type:'EXT', material:'CLAY+HARD',company:'(주)디자인원', location:'외부 외장 A ZONE',  inDate:'2026-02-20', status:'보관중'},
+    {no:6, qrId:'KIA-006', project:'2027_EV6_INT_A', stage:'FIX',       type:'INT', material:'HARD',     company:'(주)디자인원', location:'외부 내장 A ZONE',  inDate:'2026-03-01', status:'보관중'},
+    {no:7, qrId:'KIA-007', project:'2028_PV5_EXT_A', stage:'DSO',       type:'EXT', material:'CLAY',     company:'(주)폼텍',    location:'서브 스튜디오',     inDate:'2026-03-05', status:'보관중'},
+    {no:8, qrId:'KIA-008', project:'2028_PV5_INT_A', stage:'SELECTION', type:'INT', material:'CLAY+HARD',company:'(주)폼텍',    location:'',                 inDate:'2026-03-10', status:'보관중'},
+    {no:9, qrId:'KIA-009', project:'2028_PV5_EXT_B', stage:'PROGRESS',  type:'EXT', material:'HARD',     company:'(주)다이나믹', location:'지하 C ZONE',       inDate:'2026-03-12', status:'보관중'},
+    {no:10,qrId:'KIA-010', project:'2029_EV4_EXT_A', stage:'SELECTION', type:'EXT', material:'CLAY',     company:'(주)모델텍',   location:'실외 품평장',       inDate:'2026-03-15', status:'보관중'},
+  ];
+  isAdmin = true;
+  currentUser = 'PREVIEW';
+  setupHome();
+  goTo('screen-home');
+  _updateStatsUI();
+  // ────────────────────────────────────────────
 
   // 세션 없으면 로그인 버튼 정상화
   var loginBtn = document.querySelector('.login-btn');
