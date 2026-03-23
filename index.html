@@ -75,8 +75,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard',sans-serif;
 #qr-reader *,#qr-reader-loc *,#qr-reader-dis *{font-family:'Pretendard',sans-serif!important;color:var(--sub)!important;}
 #qr-reader button,#qr-reader-loc button,#qr-reader-dis button{background:#000!important;color:white!important;border:none!important;border-radius:10px!important;padding:8px 18px!important;font-weight:600!important;cursor:pointer!important;}
 #qr-reader select,#qr-reader-loc select,#qr-reader-dis select{background:var(--fill)!important;color:var(--text)!important;border:1px solid var(--line)!important;border-radius:10px!important;padding:6px 10px!important;}
-.qr-info-bar{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);}
-.qr-id{font-family:'DM Mono',monospace;font-size:12px;color:var(--sub);}
+.qr-info-bar{padding:10px 16px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);}
+.qr-id{font-family:'DM Mono',monospace;font-size:12px;color:var(--sub);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .qr-status{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;}
 .qr-status.waiting{background:var(--fill);color:#C7C7CC;}
 .qr-status.scanned{background:#F0FFF4;color:var(--success);}.qr-status.error{background:#FFEBEE;color:#C62828;}
@@ -296,7 +296,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
   </div>
   <div class="content">
     <div class="qr-scanner-area"><div id="qr-reader"></div>
-      <div class="qr-info-bar"><span class="qr-id" id="reg-qr-val">QR 코드를 스캔하세요</span><span class="qr-status waiting" id="reg-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
+      <div class="qr-info-bar"><span class="qr-id" id="reg-qr-val">QR 코드를 스캔하세요</span><span class="qr-status waiting" id="reg-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄</button></div>
     </div>
     <div class="form-section" style="margin-top:16px;">
       <div class="form-group-label">디자인 모델 정보</div>
@@ -342,7 +342,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
   </div>
   <div class="content">
     <div class="qr-scanner-area"><div id="qr-reader-loc"></div>
-      <div class="qr-info-bar"><span class="qr-id" id="loc-qr-val">모델 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="loc-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
+      <div class="qr-info-bar"><span class="qr-id" id="loc-qr-val">모델 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="loc-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄</button></div>
     </div>
     <div id="loc-model-info" style="display:none;margin:12px 16px 0;">
       <div class="model-card" style="cursor:default;">
@@ -390,7 +390,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
     <!-- QR 스캔 탭 -->
     <div id="discard-qr-tab">
       <div class="qr-scanner-area"><div id="qr-reader-dis"></div>
-        <div class="qr-info-bar"><span class="qr-id" id="dis-qr-val">폐기할 디자인 모델의 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="dis-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
+        <div class="qr-info-bar"><span class="qr-id" id="dis-qr-val">폐기할 디자인 모델의 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="dis-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄</button></div>
       </div>
       <div id="discard-info" style="display:none;margin:16px;background:var(--card);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
         <div style="padding:14px 20px;border-bottom:1px solid var(--line);"><div style="font-size:12px;color:var(--sub);">프로젝트명</div><div id="dc-name" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>
@@ -475,7 +475,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
         <div class="qr-info-bar">
           <span class="qr-id" id="qrsearch-qr-val">QR 코드를 스캔하세요</span>
           <span id="qrsearch-qr-status" class="qr-status">대기중</span>
-          <button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button>
+          <button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄</button>
         </div>
       </div>
       <div id="qrsearch-result" style="display:none;background:var(--card);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;margin-top:16px;">
