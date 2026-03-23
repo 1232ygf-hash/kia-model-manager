@@ -102,7 +102,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
 .mat-btn.selected{border-color:var(--text);background:var(--text);color:white;}
 .stage-btn{background:var(--fill);border:1.5px solid transparent;border-radius:10px;padding:3px;text-align:center;cursor:pointer;transition:all 0.2s;color:var(--sub);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;}
 .stage-btn.selected{border-color:var(--text);background:var(--text);color:white;}
-.location-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:320px;overflow-y:auto;padding:12px 0 4px;}
+.location-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:360px;overflow-y:auto;padding:12px 0 4px;}
 .loc-btn{background:var(--fill);border:1.5px solid transparent;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all 0.2s;color:var(--sub);font-family:'Pretendard',sans-serif;font-size:11px;font-weight:500;line-height:1.4;}
 .loc-btn.selected{border-color:var(--text);background:var(--text);color:white;font-weight:700;}
 .btn-section{padding:16px;}
@@ -365,10 +365,6 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
       <div class="form-group-label">보관 위치 선택</div>
       <div class="form-card" style="padding:4px 12px 12px;">
         <div class="location-grid" id="location-grid"></div>
-        <button id="loc-btn-export" class="loc-btn" style="grid-column:1/-1;width:100%;margin-top:4px;background:var(--fill);border:1.5px solid transparent;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;color:var(--sub);font-family:'Pretendard',sans-serif;font-size:13px;font-weight:500;" onclick="selectExportLocation(this)">📦 외부 반출</button>
-        <div id="export-input-wrap" style="display:none;margin-top:8px;">
-          <input id="export-location-text" type="text" placeholder="반출 목적지 입력 (예: 본사 품평)" style="width:100%;background:var(--fill);border:1.5px solid var(--text);border-radius:12px;padding:12px 14px;font-family:'Pretendard',sans-serif;font-size:14px;color:var(--text);outline:none;" oninput="updateExportLocation(this.value)">
-        </div>
       </div>
     </div>
     <div class="btn-section"><button id="loc-submit-btn" class="submit-btn primary" onclick="submitLocation()">디자인 모델 위치 등록</button></div>
@@ -1141,6 +1137,23 @@ function buildLocationGrid() {
     };
     grid.appendChild(btn);
   });
+  // 외부 반출 버튼 + 입력창을 grid 맨 아래에 추가
+  var expBtn=document.createElement('button');
+  expBtn.id='loc-btn-export'; expBtn.className='loc-btn';
+  expBtn.textContent='📦 외부 반출';
+  expBtn.style.cssText='grid-column:1/-1;width:100%;background:var(--fill);border:1.5px solid transparent;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;color:var(--sub);font-family:\'Pretendard\',sans-serif;font-size:13px;font-weight:500;';
+  expBtn.onclick=function(){ selectExportLocation(this); };
+  grid.appendChild(expBtn);
+
+  var expWrap=document.createElement('div');
+  expWrap.id='export-input-wrap'; expWrap.style.cssText='display:none;grid-column:1/-1;';
+  var expInput=document.createElement('input');
+  expInput.id='export-location-text'; expInput.type='text';
+  expInput.placeholder='반출 목적지 입력 (예: 본사 품평)';
+  expInput.style.cssText='width:100%;background:var(--fill);border:1.5px solid var(--text);border-radius:12px;padding:12px 14px;font-family:\'Pretendard\',sans-serif;font-size:14px;color:var(--text);outline:none;';
+  expInput.oninput=function(){ updateExportLocation(this.value); };
+  expWrap.appendChild(expInput);
+  grid.appendChild(expWrap);
 }
 buildLocationGrid();
 
