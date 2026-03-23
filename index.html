@@ -1979,28 +1979,6 @@ function showLoading(show){document.getElementById('loading-overlay').style.disp
     }
   } catch(e) {}
 
-  // ────────────────────────────────────────────
-  // 🔍 샘플 미리보기 모드 (GAS 없이 UI 확인용)
-  // ────────────────────────────────────────────
-  MODELS = [
-    {no:1, qrId:'KIA-001', project:'2026_EV9_EXT_A', stage:'SELECTION', type:'EXT', material:'CLAY',     company:'(주)다이나믹',  location:'지하 A ZONE',      inDate:'2026-01-10', status:'보관중'},
-    {no:2, qrId:'KIA-002', project:'2026_EV9_EXT_B', stage:'PROGRESS',  type:'EXT', material:'HARD',     company:'(주)다이나믹',  location:'지하 B ZONE',      inDate:'2026-01-15', status:'보관중'},
-    {no:3, qrId:'KIA-003', project:'2026_EV9_INT_A', stage:'APPROVAL',  type:'INT', material:'CLAY',     company:'(주)모델텍',   location:'메인 스튜디오',     inDate:'2026-02-01', status:'보관중'},
-    {no:4, qrId:'KIA-004', project:'2027_EV6_EXT_A', stage:'APPROVAL',  type:'EXT', material:'HARD',     company:'(주)모델텍',   location:'실내 품평장',       inDate:'2026-02-10', status:'보관중'},
-    {no:5, qrId:'KIA-005', project:'2027_EV6_EXT_B', stage:'FIX',       type:'EXT', material:'CLAY+HARD',company:'(주)디자인원', location:'외부 외장 A ZONE',  inDate:'2026-02-20', status:'보관중'},
-    {no:6, qrId:'KIA-006', project:'2027_EV6_INT_A', stage:'FIX',       type:'INT', material:'HARD',     company:'(주)디자인원', location:'외부 내장 A ZONE',  inDate:'2026-03-01', status:'보관중'},
-    {no:7, qrId:'KIA-007', project:'2028_PV5_EXT_A', stage:'DSO',       type:'EXT', material:'CLAY',     company:'(주)폼텍',    location:'서브 스튜디오',     inDate:'2026-03-05', status:'보관중'},
-    {no:8, qrId:'KIA-008', project:'2028_PV5_INT_A', stage:'SELECTION', type:'INT', material:'CLAY+HARD',company:'(주)폼텍',    location:'',                 inDate:'2026-03-10', status:'보관중'},
-    {no:9, qrId:'KIA-009', project:'2028_PV5_EXT_B', stage:'PROGRESS',  type:'EXT', material:'HARD',     company:'(주)다이나믹', location:'지하 C ZONE',       inDate:'2026-03-12', status:'보관중'},
-    {no:10,qrId:'KIA-010', project:'2029_EV4_EXT_A', stage:'SELECTION', type:'EXT', material:'CLAY',     company:'(주)모델텍',   location:'실외 품평장',       inDate:'2026-03-15', status:'보관중'},
-  ];
-  isAdmin = true;
-  currentUser = 'PREVIEW';
-  setupHome();
-  goTo('screen-home');
-  _updateStatsUI();
-  // ────────────────────────────────────────────
-
   // 세션 없으면 로그인 버튼 정상화
   var loginBtn = document.querySelector('.login-btn');
   if(loginBtn){loginBtn.textContent='로그인';loginBtn.disabled=false;loginBtn.classList.remove('btn-loading');}
