@@ -1140,7 +1140,7 @@ function buildLocationGrid() {
   // 외부 반출 버튼 + 입력창을 grid 맨 아래에 추가
   var expBtn=document.createElement('button');
   expBtn.id='loc-btn-export'; expBtn.className='loc-btn';
-  expBtn.textContent='📦 외부 반출';
+  expBtn.textContent='외부 반출';
   expBtn.style.cssText='grid-column:1/-1;width:100%;background:var(--fill);border:1.5px solid transparent;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;color:var(--sub);font-family:\'Pretendard\',sans-serif;font-size:13px;font-weight:500;';
   expBtn.onclick=function(){ selectExportLocation(this); };
   grid.appendChild(expBtn);
