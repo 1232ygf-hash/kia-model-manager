@@ -562,14 +562,35 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
 <script>
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbz0uYwY-zUO9zcshwozxpfyXoWW6GCP9l_2-5klcVzDSCWtwYNflqUcwxokcuzokbuZAg/exec';
 
-// fetch로 GAS 호출 (302 리다이렉트 자동 처리)
+// JSONP로 GAS 호출 (CORS 우회)
 function _gasCall(funcName, args, onSuccess, onFail) {
+  var cbName = '_gasCb_' + funcName + '_' + Date.now();
   var url = GAS_URL + '?func=' + encodeURIComponent(funcName) +
-    '&params=' + encodeURIComponent(JSON.stringify(args));
-  fetch(url, { redirect: 'follow' })
-    .then(function(res) { return res.json(); })
-    .then(function(data) { if (onSuccess) onSuccess(data); })
-    .catch(function(err) { if (onFail) onFail(err); });
+    '&params=' + encodeURIComponent(JSON.stringify(args)) +
+    '&callback=' + cbName;
+
+  var script = document.createElement('script');
+
+  var timer = setTimeout(function() {
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+    if (onFail) onFail(new Error('timeout'));
+  }, 15000);
+
+  window[cbName] = function(data) {
+    clearTimeout(timer);
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+    if (onSuccess) onSuccess(data);
+  };
+
+  script.onerror = function() {
+    clearTimeout(timer);
+    delete window[cbName];
+    if (onFail) onFail(new Error('script load error'));
+  };
+  script.src = url;
+  document.head.appendChild(script);
 };
 
 // google.script.run 호환 인터페이스
