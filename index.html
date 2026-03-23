@@ -296,7 +296,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
   </div>
   <div class="content">
     <div class="qr-scanner-area"><div id="qr-reader"></div>
-      <div class="qr-info-bar"><span class="qr-id" id="reg-qr-val">QR 코드를 스캔하세요</span><span class="qr-status waiting" id="reg-qr-status">대기중</span></div>
+      <div class="qr-info-bar"><span class="qr-id" id="reg-qr-val">QR 코드를 스캔하세요</span><span class="qr-status waiting" id="reg-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
     </div>
     <div class="form-section" style="margin-top:16px;">
       <div class="form-group-label">디자인 모델 정보</div>
@@ -342,7 +342,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
   </div>
   <div class="content">
     <div class="qr-scanner-area"><div id="qr-reader-loc"></div>
-      <div class="qr-info-bar"><span class="qr-id" id="loc-qr-val">모델 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="loc-qr-status">대기중</span></div>
+      <div class="qr-info-bar"><span class="qr-id" id="loc-qr-val">모델 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="loc-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
     </div>
     <div id="loc-model-info" style="display:none;margin:12px 0;background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);">
       <div style="padding:10px 20px;background:var(--fill);border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--sub);">모델 정보</div>
@@ -404,7 +404,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
     <!-- QR 스캔 탭 -->
     <div id="discard-qr-tab">
       <div class="qr-scanner-area"><div id="qr-reader-dis"></div>
-        <div class="qr-info-bar"><span class="qr-id" id="dis-qr-val">폐기할 디자인 모델의 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="dis-qr-status">대기중</span></div>
+        <div class="qr-info-bar"><span class="qr-id" id="dis-qr-val">폐기할 디자인 모델의 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="dis-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
       </div>
       <div id="discard-info" style="display:none;margin:16px;background:var(--card);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
         <div style="padding:14px 20px;border-bottom:1px solid var(--line);"><div style="font-size:12px;color:var(--sub);">프로젝트명</div><div id="dc-name" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>
@@ -489,6 +489,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
         <div class="qr-info-bar">
           <span class="qr-id" id="qrsearch-qr-val">QR 코드를 스캔하세요</span>
           <span id="qrsearch-qr-status" class="qr-status">대기중</span>
+          <button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button>
         </div>
       </div>
       <div id="qrsearch-result" style="display:none;background:var(--card);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;margin-top:16px;">
@@ -618,6 +619,8 @@ function formatDate(v){if(!v)return '-';var s=String(v);if(s.indexOf('T')!==-1)r
 var _camReady=false;
 function requestCameraPermission(){if(_camReady)return;if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(s){_camReady=true;s.getTracks().forEach(function(t){t.stop();});}).catch(function(){});}}
 var selectedType='EXT',selectedMaterial='CLAY',selectedStage='SELECTION',selectedLocation='',scannedQR={register:'',location:'',discard:''},qrScanners={};
+var cameraFacing = 'environment'; // 'environment'=후면, 'user'=전면
+var currentQRMode = null; // 현재 스캔 중인 모드
 
 function goTo(id) {
   var cur = document.getElementById(currentScreen);
@@ -687,12 +690,17 @@ function openQR(mode) {
   else if(mode==='location') goTo('screen-location');
   else if(mode==='discard') goTo('screen-discard');
   else if(mode==='qrsearch') goTo('screen-qrsearch');
+  // 카메라 방향 후면으로 초기화
+  cameraFacing = 'environment';
+  var flipBtns = document.querySelectorAll('.camera-flip-btn');
+  flipBtns.forEach(function(btn) { btn.textContent = '🔄 전면'; });
   _loadQRLib(function(){
     setTimeout(function(){var ids={register:'qr-reader',location:'qr-reader-loc',discard:'qr-reader-dis',qrsearch:'qr-reader-qrsearch'};startQR(mode,ids[mode]);},300);
   });
 }
 
 function startQR(mode, elementId) {
+  currentQRMode = mode;
   if (qrScanners[mode]) {
     try { qrScanners[mode].stop(); } catch(e) {}
     delete qrScanners[mode];
@@ -708,17 +716,44 @@ function startQR(mode, elementId) {
     onQRSuccess(mode, decodedText);
     try { html5QrCode.stop(); } catch(e) {}
     delete qrScanners[mode];
+    currentQRMode = null;
   };
 
   var config = { fps: 15, qrbox: function(w,h){var s=Math.round(Math.min(w,h)*0.72);return {width:s,height:s};}, experimentalFeatures:{useBarCodeDetectorIfSupported:true} };
 
   html5QrCode.start(
-    { facingMode: 'environment' },
+    { facingMode: cameraFacing },
     config,
     qrCodeSuccessCallback
   ).catch(function(err) {
     showToast('📷 카메라를 열 수 없습니다: ' + err);
   });
+}
+
+function flipCamera() {
+  var mode = currentQRMode;
+  if (!mode) return;
+  var ids = {register:'qr-reader', location:'qr-reader-loc', discard:'qr-reader-dis', qrsearch:'qr-reader-qrsearch'};
+  var elementId = ids[mode];
+  if (!elementId) return;
+
+  // 현재 카메라 중지
+  if (qrScanners[mode]) {
+    try { qrScanners[mode].stop(); } catch(e) {}
+    delete qrScanners[mode];
+  }
+
+  // 카메라 방향 전환
+  cameraFacing = (cameraFacing === 'environment') ? 'user' : 'environment';
+
+  // 버튼 아이콘 업데이트
+  var flipBtns = document.querySelectorAll('.camera-flip-btn');
+  flipBtns.forEach(function(btn) {
+    btn.textContent = cameraFacing === 'environment' ? '🔄 전면' : '🔄 후면';
+  });
+
+  // 새 카메라로 재시작
+  setTimeout(function(){ startQR(mode, elementId); }, 300);
 }
 
 function stopQR(mode) {
