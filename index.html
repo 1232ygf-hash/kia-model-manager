@@ -543,6 +543,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
     <div class="form-section">
       <div class="form-group-label">게스트 계정</div>
       <div class="form-card">
+        <div class="form-row"><label>아이디</label><input type="text" class="form-input-inline" id="guest-id" placeholder="게스트 아이디"></div>
         <div class="form-row"><label>비밀번호</label><input type="password" class="form-input-inline" id="guest-pw" placeholder="새 비밀번호"></div>
         <div class="form-row"><label>확인</label><input type="password" class="form-input-inline" id="guest-pw2" placeholder="비밀번호 재입력"></div>
       </div>
@@ -1079,7 +1080,7 @@ function _updateStatsUI() {
 }
 
 function loadAccounts() {
-  ['admin-id','admin-pw','admin-pw2','user-id','user-pw','user-pw2','guest-pw','guest-pw2'].forEach(function(id) {
+  ['admin-id','admin-pw','admin-pw2','user-id','user-pw','user-pw2','guest-id','guest-pw','guest-pw2'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -1088,10 +1089,13 @@ function loadAccounts() {
       if (res.success && res.accounts) {
         var admin = res.accounts.find(function(a){ return a.role==='관리자'; });
         var user  = res.accounts.find(function(a){ return a.role==='일반'; });
+        var guest = res.accounts.find(function(a){ return a.role==='게스트'; });
         var adminEl = document.getElementById('admin-id');
         var userEl  = document.getElementById('user-id');
+        var guestEl = document.getElementById('guest-id');
         if (admin && adminEl) adminEl.value = admin.id;
         if (user  && userEl)  userEl.value  = user.id;
+        if (guest && guestEl) guestEl.value = guest.id;
       }
     })
     .withFailureHandler(function(){})
@@ -1105,13 +1109,14 @@ function submitAccount(target) {
   var userId   = target==='user'  ? (document.getElementById('user-id') ? document.getElementById('user-id').value.trim() : '') : '';
   var userPw   = target==='user'  ? (document.getElementById('user-pw') ? document.getElementById('user-pw').value.trim() : '') : '';
   var userPw2  = target==='user'  ? (document.getElementById('user-pw2') ? document.getElementById('user-pw2').value.trim() : '') : '';
+  var guestId  = target==='guest' ? (document.getElementById('guest-id') ? document.getElementById('guest-id').value.trim() : '') : '';
   var guestPw  = target==='guest' ? (document.getElementById('guest-pw') ? document.getElementById('guest-pw').value.trim() : '') : '';
   var guestPw2 = target==='guest' ? (document.getElementById('guest-pw2') ? document.getElementById('guest-pw2').value.trim() : '') : '';
 
   if (adminPw && adminPw !== adminPw2) { showToast('❌ 관리자 비밀번호가 일치하지 않습니다'); return; }
   if (userPw  && userPw  !== userPw2)  { showToast('❌ 일반 비밀번호가 일치하지 않습니다'); return; }
   if (guestPw && guestPw !== guestPw2) { showToast('❌ 게스트 비밀번호가 일치하지 않습니다'); return; }
-  if (!adminId && !adminPw && !userId && !userPw && !guestPw) { showToast('❌ 변경할 내용을 입력해주세요'); return; }
+  if (!adminId && !adminPw && !userId && !userPw && !guestId && !guestPw) { showToast('❌ 변경할 내용을 입력해주세요'); return; }
 
   var _btnId = target==='admin' ? 'acc-admin-btn' : target==='user' ? 'acc-user-btn' : 'acc-guest-btn';
   var _accBtn = document.getElementById(_btnId);
@@ -1127,7 +1132,7 @@ function submitAccount(target) {
       if(_accBtn){_accBtn.textContent=_btnLabel;_accBtn.disabled=false;_accBtn.classList.remove('btn-loading');}
       showToast('❌ 변경 오류');
     })
-    .updateAccounts({ adminId:adminId, adminPw:adminPw, userId:userId, userPw:userPw, guestPw:guestPw });
+    .updateAccounts({ adminId:adminId, adminPw:adminPw, userId:userId, userPw:userPw, guestId:guestId, guestPw:guestPw });
 }
 
 function selectStage(btn,val) {
