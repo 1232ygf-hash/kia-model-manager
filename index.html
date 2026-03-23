@@ -75,8 +75,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard',sans-serif;
 #qr-reader *,#qr-reader-loc *,#qr-reader-dis *{font-family:'Pretendard',sans-serif!important;color:var(--sub)!important;}
 #qr-reader button,#qr-reader-loc button,#qr-reader-dis button{background:#000!important;color:white!important;border:none!important;border-radius:10px!important;padding:8px 18px!important;font-weight:600!important;cursor:pointer!important;}
 #qr-reader select,#qr-reader-loc select,#qr-reader-dis select{background:var(--fill)!important;color:var(--text)!important;border:1px solid var(--line)!important;border-radius:10px!important;padding:6px 10px!important;}
-.qr-info-bar{padding:10px 16px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);}
-.qr-id{font-family:'DM Mono',monospace;font-size:12px;color:var(--sub);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.qr-info-bar{padding:10px 16px;display:flex;align-items:flex-start;gap:8px;border-top:1px solid var(--line);}
+.qr-id{font-family:'DM Mono',monospace;font-size:12px;color:var(--sub);flex:1;min-width:0;padding-top:2px;}
 .qr-status{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;}
 .qr-status.waiting{background:var(--fill);color:#C7C7CC;}
 .qr-status.scanned{background:#F0FFF4;color:var(--success);}.qr-status.error{background:#FFEBEE;color:#C62828;}
@@ -265,7 +265,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
   <div class="menu-section">
     <div class="section-label" style="letter-spacing:0.5px;">GENERAL</div>
     <div class="menu-group">
-      <div class="menu-row" onclick="openQR('location')">
+      <div id="menu-row-location" class="menu-row" onclick="openQR('location')">
         <div class="row-icon blue">📍</div>
         <div class="row-text"><div class="row-title">디자인 모델 위치 등록</div><div class="row-desc">QR 스캔 후 보관 위치 지정</div></div>
         <div class="row-chevron">›</div>
@@ -540,6 +540,16 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
         <button id="acc-user-btn" class="submit-btn primary" onclick="submitAccount('user')">일반 적용</button>
       </div>
     </div>
+    <div class="form-section">
+      <div class="form-group-label">게스트 계정</div>
+      <div class="form-card">
+        <div class="form-row"><label>비밀번호</label><input type="password" class="form-input-inline" id="guest-pw" placeholder="새 비밀번호"></div>
+        <div class="form-row"><label>확인</label><input type="password" class="form-input-inline" id="guest-pw2" placeholder="비밀번호 재입력"></div>
+      </div>
+      <div class="btn-section" style="margin-top:12px;">
+        <button id="acc-guest-btn" class="submit-btn primary" onclick="submitAccount('guest')">게스트 적용</button>
+      </div>
+    </div>
     <div class="acc-tip">💡 변경하지 않을 항목은 비워두세요<br>💡 변경사항은 구글 시트 "계정" 탭에 즉시 반영됩니다</div>
   </div>
 </div>
@@ -595,7 +605,7 @@ var LOCATIONS = [
   {group:'외부 내장',zones:['외부 내장 A ZONE','외부 내장 B ZONE','외부 내장 C ZONE','외부 내장 D ZONE']},
 ];
 var ALL_ZONES = LOCATIONS.reduce(function(acc,g){return acc.concat(g.zones);},[]);;
-var MODELS=[],isAdmin=true,currentUser='',currentScreen='screen-login';
+var MODELS=[],isAdmin=true,userRole='관리자',currentUser='',currentScreen='screen-login'; // userRole: '관리자'|'일반'|'게스트'
 var _qrCache=null;
 function fetchRegisteredQRs(cb){if(_qrCache!==null){cb(_qrCache);return;}google.script.run.withSuccessHandler(function(res){_qrCache=(res&&res.models)?res.models.map(function(m){return m.qrId;}):[];cb(_qrCache);}).withFailureHandler(function(){cb([]);}).getAllModels();}
 function invalidateQRCache(){_qrCache=null;}
@@ -987,6 +997,7 @@ function doLogin() {
         if (res.success) {
           if(_lb){_lb.textContent='로그인';_lb.disabled=false;_lb.classList.remove('btn-loading');}
           isAdmin = res.role === '관리자';
+          userRole = res.role;
           currentUser = res.name;
           // 로그인 세션 저장 (오늘 날짜 기준)
           var today = new Date().toDateString();
@@ -1005,6 +1016,7 @@ function doLogin() {
     // 로컬 테스트
     if ((id === 'admin' && pw === '1234') || (id === 'user' && pw === '1234')) {
       isAdmin = (id === 'admin');
+      userRole = isAdmin ? '관리자' : '일반';
       currentUser = id;
       setupHome();
       goTo('screen-home');
@@ -1018,12 +1030,22 @@ function doLogin() {
 function setupHome() {
   var adminS  = document.getElementById('admin-section');
   var gearBtn = document.getElementById('gear-btn');
-  if (isAdmin) {
+  var generalS = document.getElementById('general-section');
+  var locRow  = document.getElementById('menu-row-location');
+
+  if (userRole === '관리자') {
     if (adminS)  adminS.style.display  = 'block';
     if (gearBtn) gearBtn.style.display = 'block';
-  } else {
+    if (locRow)  locRow.style.display  = 'flex';
+  } else if (userRole === '일반') {
     if (adminS)  adminS.style.display  = 'none';
     if (gearBtn) gearBtn.style.display = 'none';
+    if (locRow)  locRow.style.display  = 'flex';
+  } else {
+    // 게스트: 위치등록 숨김, admin 섹션 숨김
+    if (adminS)  adminS.style.display  = 'none';
+    if (gearBtn) gearBtn.style.display = 'none';
+    if (locRow)  locRow.style.display  = 'none';
   }
 }
 
@@ -1057,7 +1079,7 @@ function _updateStatsUI() {
 }
 
 function loadAccounts() {
-  ['admin-id','admin-pw','admin-pw2','user-id','user-pw','user-pw2'].forEach(function(id) {
+  ['admin-id','admin-pw','admin-pw2','user-id','user-pw','user-pw2','guest-pw','guest-pw2'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -1083,25 +1105,29 @@ function submitAccount(target) {
   var userId   = target==='user'  ? (document.getElementById('user-id') ? document.getElementById('user-id').value.trim() : '') : '';
   var userPw   = target==='user'  ? (document.getElementById('user-pw') ? document.getElementById('user-pw').value.trim() : '') : '';
   var userPw2  = target==='user'  ? (document.getElementById('user-pw2') ? document.getElementById('user-pw2').value.trim() : '') : '';
+  var guestPw  = target==='guest' ? (document.getElementById('guest-pw') ? document.getElementById('guest-pw').value.trim() : '') : '';
+  var guestPw2 = target==='guest' ? (document.getElementById('guest-pw2') ? document.getElementById('guest-pw2').value.trim() : '') : '';
 
   if (adminPw && adminPw !== adminPw2) { showToast('❌ 관리자 비밀번호가 일치하지 않습니다'); return; }
   if (userPw  && userPw  !== userPw2)  { showToast('❌ 일반 비밀번호가 일치하지 않습니다'); return; }
-  if (!adminId && !adminPw && !userId && !userPw) { showToast('❌ 변경할 내용을 입력해주세요'); return; }
+  if (guestPw && guestPw !== guestPw2) { showToast('❌ 게스트 비밀번호가 일치하지 않습니다'); return; }
+  if (!adminId && !adminPw && !userId && !userPw && !guestPw) { showToast('❌ 변경할 내용을 입력해주세요'); return; }
 
-  var _btnId = target==='admin' ? 'acc-admin-btn' : 'acc-user-btn';
+  var _btnId = target==='admin' ? 'acc-admin-btn' : target==='user' ? 'acc-user-btn' : 'acc-guest-btn';
   var _accBtn = document.getElementById(_btnId);
+  var _btnLabel = target==='admin' ? '관리자 적용' : target==='user' ? '일반 적용' : '게스트 적용';
   if(_accBtn){_accBtn.textContent='적용 중...';_accBtn.disabled=true;_accBtn.classList.add('btn-loading');}
   google.script.run
     .withSuccessHandler(function(res) {
       if(_accBtn){_accBtn.textContent='적용 완료 ✅';_accBtn.classList.remove('btn-loading');}
       showToast(res.success ? '✅ 계정이 변경되었습니다' : '❌ ' + res.message);
-      if (res.success) setTimeout(function(){ if(_accBtn){_accBtn.textContent=(target==='admin'?'관리자 적용':'일반 적용');_accBtn.disabled=false;} goTo('screen-home'); }, 1000);
+      if (res.success) setTimeout(function(){ if(_accBtn){_accBtn.textContent=_btnLabel;_accBtn.disabled=false;} goTo('screen-home'); }, 1000);
     })
     .withFailureHandler(function(){
-      if(_accBtn){_accBtn.textContent=(target==='admin'?'관리자 적용':'일반 적용');_accBtn.disabled=false;_accBtn.classList.remove('btn-loading');}
+      if(_accBtn){_accBtn.textContent=_btnLabel;_accBtn.disabled=false;_accBtn.classList.remove('btn-loading');}
       showToast('❌ 변경 오류');
     })
-    .updateAccounts({ adminId:adminId, adminPw:adminPw, userId:userId, userPw:userPw });
+    .updateAccounts({ adminId:adminId, adminPw:adminPw, userId:userId, userPw:userPw, guestPw:guestPw });
 }
 
 function selectStage(btn,val) {
@@ -1956,6 +1982,7 @@ function showLoading(show){document.getElementById('loading-overlay').style.disp
     var session = JSON.parse(localStorage.getItem('kia_session'));
     if(session && session.date === new Date().toDateString()) {
       isAdmin = session.role === '관리자';
+      userRole = session.role;
       currentUser = session.name;
       setupHome();
       goTo('screen-home');
