@@ -75,8 +75,9 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard',sans-serif;
 #qr-reader *,#qr-reader-loc *,#qr-reader-dis *{font-family:'Pretendard',sans-serif!important;color:var(--sub)!important;}
 #qr-reader button,#qr-reader-loc button,#qr-reader-dis button{background:#000!important;color:white!important;border:none!important;border-radius:10px!important;padding:8px 18px!important;font-weight:600!important;cursor:pointer!important;}
 #qr-reader select,#qr-reader-loc select,#qr-reader-dis select{background:var(--fill)!important;color:var(--text)!important;border:1px solid var(--line)!important;border-radius:10px!important;padding:6px 10px!important;}
-.qr-info-bar{padding:10px 16px;display:flex;align-items:flex-start;gap:8px;border-top:1px solid var(--line);}
-.qr-id{font-family:'DM Mono',monospace;font-size:12px;color:var(--sub);flex:1;min-width:0;padding-top:2px;}
+.qr-info-bar{padding:10px 16px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);}
+.qr-info-bar-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;}
+.qr-id{font-family:'DM Mono',monospace;font-size:12px;color:var(--sub);}
 .qr-status{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;}
 .qr-status.waiting{background:var(--fill);color:#C7C7CC;}
 .qr-status.scanned{background:#F0FFF4;color:var(--success);}.qr-status.error{background:#FFEBEE;color:#C62828;}
@@ -296,7 +297,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
   </div>
   <div class="content">
     <div class="qr-scanner-area"><div id="qr-reader"></div>
-      <div class="qr-info-bar"><span class="qr-id" id="reg-qr-val">QR 코드를 스캔하세요</span><span class="qr-status waiting" id="reg-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄</button></div>
+      <div class="qr-info-bar"><div class="qr-info-bar-text"><span class="qr-id" id="reg-qr-val">QR 코드를 스캔하세요</span><span class="qr-status waiting" id="reg-qr-status">대기중</span></div><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
     </div>
     <div class="form-section" style="margin-top:16px;">
       <div class="form-group-label">디자인 모델 정보</div>
@@ -342,7 +343,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
   </div>
   <div class="content">
     <div class="qr-scanner-area"><div id="qr-reader-loc"></div>
-      <div class="qr-info-bar"><span class="qr-id" id="loc-qr-val">모델 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="loc-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄</button></div>
+      <div class="qr-info-bar"><div class="qr-info-bar-text"><span class="qr-id" id="loc-qr-val">모델 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="loc-qr-status">대기중</span></div><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
     </div>
     <div id="loc-model-info" style="display:none;margin:12px 16px 0;">
       <div class="model-card" style="cursor:default;">
@@ -390,7 +391,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
     <!-- QR 스캔 탭 -->
     <div id="discard-qr-tab">
       <div class="qr-scanner-area"><div id="qr-reader-dis"></div>
-        <div class="qr-info-bar"><span class="qr-id" id="dis-qr-val">폐기할 디자인 모델의 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="dis-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄</button></div>
+        <div class="qr-info-bar"><div class="qr-info-bar-text"><span class="qr-id" id="dis-qr-val">폐기할 디자인 모델의 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="dis-qr-status">대기중</span></div><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
       </div>
       <div id="discard-info" style="display:none;margin:16px;background:var(--card);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
         <div style="padding:14px 20px;border-bottom:1px solid var(--line);"><div style="font-size:12px;color:var(--sub);">프로젝트명</div><div id="dc-name" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>
@@ -473,9 +474,11 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
       <div class="qr-scanner-area">
         <div id="qr-reader-qrsearch"></div>
         <div class="qr-info-bar">
-          <span class="qr-id" id="qrsearch-qr-val">QR 코드를 스캔하세요</span>
-          <span id="qrsearch-qr-status" class="qr-status">대기중</span>
-          <button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄</button>
+          <div class="qr-info-bar-text">
+            <span class="qr-id" id="qrsearch-qr-val">QR 코드를 스캔하세요</span>
+            <span id="qrsearch-qr-status" class="qr-status">대기중</span>
+          </div>
+          <button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button>
         </div>
       </div>
       <div id="qrsearch-result" style="display:none;background:var(--card);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;margin-top:16px;">
@@ -522,8 +525,8 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
       <div class="form-group-label">관리자 계정</div>
       <div class="form-card">
         <div class="form-row"><label>아이디</label><input type="text" class="form-input-inline" id="admin-id" placeholder="관리자 아이디"></div>
-        <div class="form-row"><label>비밀번호</label><input type="password" class="form-input-inline" id="admin-pw" placeholder="새 비밀번호"></div>
-        <div class="form-row"><label>확인</label><input type="password" class="form-input-inline" id="admin-pw2" placeholder="비밀번호 재입력"></div>
+        <div class="form-row"><label>비밀번호</label><input type="password" class="form-input-inline" id="admin-pw" placeholder="새 비밀번호"><button type="button" onclick="togglePw('admin-pw',this)" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0 4px;flex-shrink:0;">👁</button></div>
+        <div class="form-row"><label>확인</label><input type="password" class="form-input-inline" id="admin-pw2" placeholder="비밀번호 재입력"><button type="button" onclick="togglePw('admin-pw2',this)" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0 4px;flex-shrink:0;">👁</button></div>
       </div>
       <div class="btn-section" style="margin-top:12px;">
         <button id="acc-admin-btn" class="submit-btn primary" onclick="submitAccount('admin')">관리자 적용</button>
@@ -533,8 +536,8 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
       <div class="form-group-label">일반 계정</div>
       <div class="form-card">
         <div class="form-row"><label>아이디</label><input type="text" class="form-input-inline" id="user-id" placeholder="일반 아이디"></div>
-        <div class="form-row"><label>비밀번호</label><input type="password" class="form-input-inline" id="user-pw" placeholder="새 비밀번호"></div>
-        <div class="form-row"><label>확인</label><input type="password" class="form-input-inline" id="user-pw2" placeholder="비밀번호 재입력"></div>
+        <div class="form-row"><label>비밀번호</label><input type="password" class="form-input-inline" id="user-pw" placeholder="새 비밀번호"><button type="button" onclick="togglePw('user-pw',this)" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0 4px;flex-shrink:0;">👁</button></div>
+        <div class="form-row"><label>확인</label><input type="password" class="form-input-inline" id="user-pw2" placeholder="비밀번호 재입력"><button type="button" onclick="togglePw('user-pw2',this)" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0 4px;flex-shrink:0;">👁</button></div>
       </div>
       <div class="btn-section" style="margin-top:12px;">
         <button id="acc-user-btn" class="submit-btn primary" onclick="submitAccount('user')">일반 적용</button>
@@ -544,8 +547,8 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
       <div class="form-group-label">게스트 계정</div>
       <div class="form-card">
         <div class="form-row"><label>아이디</label><input type="text" class="form-input-inline" id="guest-id" placeholder="게스트 아이디"></div>
-        <div class="form-row"><label>비밀번호</label><input type="password" class="form-input-inline" id="guest-pw" placeholder="새 비밀번호"></div>
-        <div class="form-row"><label>확인</label><input type="password" class="form-input-inline" id="guest-pw2" placeholder="비밀번호 재입력"></div>
+        <div class="form-row"><label>비밀번호</label><input type="password" class="form-input-inline" id="guest-pw" placeholder="새 비밀번호"><button type="button" onclick="togglePw('guest-pw',this)" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0 4px;flex-shrink:0;">👁</button></div>
+        <div class="form-row"><label>확인</label><input type="password" class="form-input-inline" id="guest-pw2" placeholder="비밀번호 재입력"><button type="button" onclick="togglePw('guest-pw2',this)" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0 4px;flex-shrink:0;">👁</button></div>
       </div>
       <div class="btn-section" style="margin-top:12px;">
         <button id="acc-guest-btn" class="submit-btn primary" onclick="submitAccount('guest')">게스트 적용</button>
@@ -1126,7 +1129,7 @@ function submitAccount(target) {
     .withSuccessHandler(function(res) {
       if(_accBtn){_accBtn.textContent='적용 완료 ✅';_accBtn.classList.remove('btn-loading');}
       showToast(res.success ? '✅ 계정이 변경되었습니다' : '❌ ' + res.message);
-      if (res.success) setTimeout(function(){ if(_accBtn){_accBtn.textContent=_btnLabel;_accBtn.disabled=false;} goTo('screen-home'); }, 1000);
+      if (res.success) setTimeout(function(){ if(_accBtn){_accBtn.textContent=_btnLabel;_accBtn.disabled=false;} }, 1500);
     })
     .withFailureHandler(function(){
       if(_accBtn){_accBtn.textContent=_btnLabel;_accBtn.disabled=false;_accBtn.classList.remove('btn-loading');}
@@ -1135,7 +1138,17 @@ function submitAccount(target) {
     .updateAccounts({ adminId:adminId, adminPw:adminPw, userId:userId, userPw:userPw, guestId:guestId, guestPw:guestPw });
 }
 
-function selectStage(btn,val) {
+function togglePw(inputId, btn) {
+  var el = document.getElementById(inputId);
+  if (!el) return;
+  if (el.type === 'password') {
+    el.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    el.type = 'password';
+    btn.textContent = '👁';
+  }
+}
   document.querySelectorAll('.stage-btn').forEach(function(b){b.classList.remove('selected');});
   btn.classList.add('selected'); selectedStage=val;
 }
