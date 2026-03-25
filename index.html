@@ -2125,16 +2125,35 @@ function closeParkingOverlay(e) {
 function confirmParkingSpot() {
   if (!_parkingSpot) { showToast('❌ 구역을 선택해주세요'); return; }
   var full = _parkingZone + ' ' + _parkingSpot;
+
   // 위치 선택 반영
   document.querySelectorAll('.loc-btn').forEach(function(b){b.classList.remove('selected');});
-  var allBtns = document.querySelectorAll('.loc-btn');
-  allBtns.forEach(function(b){ if(b.textContent.trim()===_parkingZone) b.classList.add('selected'); });
+  document.querySelectorAll('.loc-btn').forEach(function(b){ if(b.textContent.trim()===_parkingZone) b.classList.add('selected'); });
   selectedLocation = full;
+
   // 모델카드 위치 업데이트
   var locEl = document.getElementById('loc-m-loc');
   if(locEl) locEl.textContent = '📍 ' + full;
-  document.getElementById('parking-overlay').style.display = 'none';
-  showToast('📍 ' + full + ' 선택됨');
+
+  // 버튼 애니메이션: 등록중 깜빡 → 등록완료!
+  var confirmBtn = document.getElementById('parking-confirm-btn');
+  if(confirmBtn) {
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = '등록 중...';
+    confirmBtn.classList.add('btn-loading');
+    setTimeout(function() {
+      confirmBtn.textContent = '등록완료! ✅';
+      confirmBtn.classList.remove('btn-loading');
+      setTimeout(function() {
+        document.getElementById('parking-overlay').style.display = 'none';
+        // 바로 위치 등록 실행
+        submitLocation();
+      }, 800);
+    }, 600);
+  } else {
+    document.getElementById('parking-overlay').style.display = 'none';
+    submitLocation();
+  }
 }
 // ────────────────────────────────────────
 
@@ -2150,7 +2169,7 @@ document.getElementById('reg-date').valueAsDate=new Date();
     <div style="font-size:16px;font-weight:700;margin-bottom:4px;" id="parking-zone-title"></div>
     <div style="font-size:12px;color:#8E8E93;margin-bottom:12px;">모델이 위치한 구역을 선택해주세요</div>
     <div class="parking-lot" id="parking-lot-grid"></div>
-    <button class="parking-confirm" onclick="confirmParkingSpot()">선택 완료</button>
+    <button class="parking-confirm" id="parking-confirm-btn" onclick="confirmParkingSpot()">디자인 모델 위치 등록</button>
   </div>
 </div>
 
