@@ -1512,6 +1512,11 @@ function submitDiscard() {
         goTo('screen-home');
         showToast('🗑 '+res.message);
         loadStats();
+        // MODELS 캐시 즉시 갱신
+        google.script.run
+          .withSuccessHandler(function(r){ if(r&&r.success){ MODELS=r.models.filter(function(m){return m.status!=='폐기';}); _updateStatsUI(); } })
+          .withFailureHandler(function(){})
+          .getAllModels();
       }else{showToast('❌ '+res.message);}
     })
     .withFailureHandler(function(){ showToast('❌ 폐기 오류'); })
@@ -1814,6 +1819,10 @@ function submitMultiDiscard(qrIds) {
           goTo('screen-home');
           showToast('🗑 ' + total + '개 폐기 완료');
           loadStats();
+          google.script.run
+            .withSuccessHandler(function(r){ if(r&&r.success){ MODELS=r.models.filter(function(m){return m.status!=='폐기';}); _updateStatsUI(); } })
+            .withFailureHandler(function(){})
+            .getAllModels();
         }
       })
       .withFailureHandler(function(){ done++; showToast('❌ 폐기 오류: ' + qrid); })
