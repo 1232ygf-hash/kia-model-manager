@@ -724,7 +724,19 @@ function _loadQRLib(cb) {
 function openQR(mode) {
   if(mode==='register') goTo('screen-register');
   else if(mode==='location') goTo('screen-location');
-  else if(mode==='discard') goTo('screen-discard');
+  else if(mode==='discard') {
+    // 폐기 화면 열 때 이전 정보 초기화
+    scannedQR.discard = '';
+    var disInfo = document.getElementById('discard-info');
+    if(disInfo) disInfo.style.display = 'none';
+    var disStat = document.getElementById('dis-qr-status');
+    if(disStat){ disStat.textContent='대기중'; disStat.className='qr-status waiting'; }
+    var disVal = document.getElementById('dis-qr-val');
+    if(disVal) disVal.textContent='QR 코드를 스캔하세요';
+    var disBtn = document.getElementById('discard-btn');
+    if(disBtn){ disBtn.textContent='🗑 폐기 처리'; disBtn.disabled=false; }
+    goTo('screen-discard');
+  }
   else if(mode==='qrsearch') goTo('screen-qrsearch');
   // 카메라 방향 후면으로 초기화
   cameraFacing = 'environment';
