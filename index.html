@@ -79,6 +79,15 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard',sans-serif;
 .qr-info-bar-text{flex:1;min-width:0;display:flex;flex-direction:row;align-items:center;gap:8px;}
 .qr-id{font-family:'DM Mono',monospace;font-size:12px;color:var(--sub);}
 .qr-status{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;}
+
+.parking-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-end;z-index:9999;}
+.parking-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;max-height:88vh;overflow-y:auto;}
+.parking-handle{width:40px;height:4px;background:#E5E5EA;border-radius:2px;margin:0 auto 14px;}
+.parking-lot{background:#F2F2F7;border:2px solid #E5E5EA;border-radius:20px;padding:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.car-spot-btn{cursor:pointer;border:none;background:none;padding:0;transition:opacity 0.15s;}
+.car-spot-btn:active{opacity:0.6;}
+.parking-confirm{margin-top:14px;width:100%;background:#000;color:#fff;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;}
+
 .qr-status.waiting{background:var(--fill);color:#C7C7CC;}
 .qr-status.scanned{background:#F0FFF4;color:var(--success);}.qr-status.error{background:#FFEBEE;color:#C62828;}
 
@@ -1186,6 +1195,8 @@ function buildLocationGrid() {
     var btn=document.createElement('button');
     btn.className='loc-btn'; btn.textContent=zone;
     btn.onclick=function(){
+      // 세부구역 있는 ZONE이면 팝업 열기
+      if(openParkingOverlay(zone)) return;
       document.querySelectorAll('.loc-btn').forEach(function(b){b.classList.remove('selected');});
       // 외부 반출 버튼/입력창 초기화
       var expBtn=document.getElementById('loc-btn-export');
@@ -2047,9 +2058,88 @@ function showLoading(show){document.getElementById('loading-overlay').style.disp
   if(loginBtn){loginBtn.textContent='로그인';loginBtn.disabled=false;loginBtn.classList.remove('btn-loading');}
 })();
 
+
+// ── 주차 구역 세부 선택 ──────────────────
+var ZONE_SPOTS = {
+  '지하 A ZONE': ['A-7','A-8','A-9','A-4','A-5','A-6','A-1','A-2','A-3']
+};
+var _parkingZone = '';
+var _parkingSpot = '';
+
+function carSpotSVG(label, selected) {
+  var outer = selected ? 'background:#1C1C1E;border:2px solid #1C1C1E;' : 'background:#fff;border:2px solid #C7C7CC;';
+  var inner = selected ? 'background:#3A3A3C;border:1.5px solid #555;' : 'background:#F8F8F8;border:1.5px solid #D1D1D6;';
+  var mirror = selected ? 'background:#48484A;border:1px solid #555;' : 'background:#E5E5EA;border:1px solid #C7C7CC;';
+  var textCol = selected ? 'color:#fff;' : 'color:#1C1C1E;';
+  return '<div style="' + outer + 'border-radius:16px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;position:relative;">'
+    + '<div style="' + inner + 'border-radius:12px;width:100%;height:80px;display:flex;align-items:center;justify-content:center;position:relative;">'
+    + '<span style="font-size:11px;font-weight:700;' + textCol + 'font-family:Pretendard,sans-serif;">' + label + '</span>'
+    + '<div style="' + mirror + 'position:absolute;left:-8px;bottom:18px;width:8px;height:14px;border-radius:3px 0 0 3px;"></div>'
+    + '<div style="' + mirror + 'position:absolute;right:-8px;bottom:18px;width:8px;height:14px;border-radius:0 3px 3px 0;"></div>'
+    + '</div>'
+    + '</div>';
+}
+
+function openParkingOverlay(zone) {
+  var spots = ZONE_SPOTS[zone];
+  if (!spots) return false;
+  _parkingZone = zone;
+  _parkingSpot = '';
+  document.getElementById('parking-zone-title').textContent = zone;
+  var grid = document.getElementById('parking-lot-grid');
+  grid.innerHTML = '';
+  spots.forEach(function(spot) {
+    var btn = document.createElement('button');
+    btn.className = 'car-spot-btn';
+    btn.innerHTML = carSpotSVG(spot, false);
+    btn.onclick = function() {
+      var btns = grid.querySelectorAll('.car-spot-btn');
+      spots.forEach(function(s, i) { btns[i].innerHTML = carSpotSVG(s, s === spot); });
+      _parkingSpot = spot;
+    };
+    grid.appendChild(btn);
+  });
+  document.getElementById('parking-overlay').style.display = 'flex';
+  return true;
+}
+
+function closeParkingOverlay(e) {
+  if (e.target === document.getElementById('parking-overlay')) {
+    document.getElementById('parking-overlay').style.display = 'none';
+  }
+}
+
+function confirmParkingSpot() {
+  if (!_parkingSpot) { showToast('❌ 구역을 선택해주세요'); return; }
+  var full = _parkingZone + ' ' + _parkingSpot;
+  // 위치 선택 반영
+  document.querySelectorAll('.loc-btn').forEach(function(b){b.classList.remove('selected');});
+  var allBtns = document.querySelectorAll('.loc-btn');
+  allBtns.forEach(function(b){ if(b.textContent.trim()===_parkingZone) b.classList.add('selected'); });
+  selectedLocation = full;
+  // 모델카드 위치 업데이트
+  var locEl = document.getElementById('loc-m-loc');
+  if(locEl) locEl.textContent = '📍 ' + full;
+  document.getElementById('parking-overlay').style.display = 'none';
+  showToast('📍 ' + full + ' 선택됨');
+}
+// ────────────────────────────────────────
+
 function showToast(msg){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
 
 document.getElementById('reg-date').valueAsDate=new Date();
 </script>
+
+<!-- 주차 구역 세부 선택 팝업 -->
+<div id="parking-overlay" style="display:none;" class="parking-overlay" onclick="closeParkingOverlay(event)">
+  <div class="parking-sheet">
+    <div class="parking-handle"></div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:4px;" id="parking-zone-title"></div>
+    <div style="font-size:12px;color:#8E8E93;margin-bottom:12px;">모델이 위치한 구역을 선택해주세요</div>
+    <div class="parking-lot" id="parking-lot-grid"></div>
+    <button class="parking-confirm" onclick="confirmParkingSpot()">선택 완료</button>
+  </div>
+</div>
+
 </body>
 </html>
