@@ -728,8 +728,19 @@ function openQR(mode) {
     if(regStat){ regStat.textContent='대기중'; regStat.className='qr-status waiting'; }
     var regVal = document.getElementById('reg-qr-val');
     if(regVal) regVal.textContent='QR 코드를 스캔하세요';
+    // 버튼 초기화
+    var regBtn = document.querySelector('#screen-register .submit-btn');
+    if(regBtn){ regBtn.textContent='디자인 모델 등록'; regBtn.style.background=''; regBtn.disabled=false; }
+    // 폼 필드 초기화
+    var proj = document.getElementById('reg-project'); if(proj) proj.value='';
+    var comp = document.getElementById('reg-company'); if(comp) comp.value='';
+    var memo = document.getElementById('reg-memo'); if(memo) memo.value='';
+    var date = document.getElementById('reg-date'); if(date) date.valueAsDate=new Date();
+    selectedStage='SELECTION'; selectedType='EXT'; selectedMaterial='CLAY';
+    document.querySelectorAll('.stage-btn').forEach(function(b){b.classList.remove('selected');}); var sb=document.querySelector('.stage-btn'); if(sb) sb.classList.add('selected');
+    document.querySelectorAll('.type-btn').forEach(function(b){b.classList.remove('selected');}); var tb=document.querySelector('.type-btn'); if(tb) tb.classList.add('selected');
+    document.querySelectorAll('.mat-btn').forEach(function(b){b.classList.remove('selected');}); var mb=document.querySelector('.mat-btn'); if(mb) mb.classList.add('selected');
     goTo('screen-register');
-    setTimeout(function(){ resetForm(); }, 50);
   }
   else if(mode==='location') goTo('screen-location');
   else if(mode==='discard') {
