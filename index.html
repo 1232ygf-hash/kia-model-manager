@@ -322,7 +322,8 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
           <div style="flex:1;padding:2px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <button class="mat-btn selected" onclick="selectMaterial(this,'CLAY')">CLAY</button>
             <button class="mat-btn" onclick="selectMaterial(this,'HARD')">HARD</button>
-            <button class="mat-btn" onclick="selectMaterial(this,'CLAY+HARD')" style="grid-column:1/-1;">CLAY+HARD</button>
+            <button class="mat-btn" onclick="selectMaterial(this,'3DP')">3DP</button>
+            <button class="mat-btn" onclick="selectMaterial(this,'CLAY+HARD')">CLAY+HARD</button>
           </div>
         </div>
         <div class="form-row"><label>제작회사 <span class="req">*</span></label><input type="text" class="form-input-inline" id="reg-company" placeholder="(주)다이나믹"></div>
@@ -391,7 +392,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
     <!-- QR 스캔 탭 -->
     <div id="discard-qr-tab">
       <div class="qr-scanner-area"><div id="qr-reader-dis"></div>
-        <div style="padding:0 16px 8px;margin-top:12px;border-top:1px solid var(--line);padding-top:10px;"><div style="display:flex;align-items:center;justify-content:space-between;"><span class="qr-id">폐기할 디자인 모델의</span><div style="display:flex;align-items:center;gap:8px;"><span class="qr-status waiting" id="dis-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">🔄 전면</button></div></div><span class="qr-id" id="dis-qr-val" style="display:block;margin-top:2px;">QR 코드를 스캔하세요</span></div>
+        <div style="padding:0 16px 8px;margin-top:12px;border-top:1px solid var(--line);padding-top:10px;"><div style="display:flex;align-items:center;justify-content:space-between;"><span class="qr-id">QR 코드를 스캔하세요</span><div style="display:flex;align-items:center;gap:8px;"><span class="qr-status waiting" id="dis-qr-status">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;">🔄 전면</button></div></div><span class="qr-id" id="dis-qr-val" style="display:block;margin-top:2px;">QR 코드를 스캔하세요</span></div>
       </div>
       <div id="discard-info" style="display:none;margin:16px;background:var(--card);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
         <div style="padding:14px 20px;border-bottom:1px solid var(--line);"><div style="font-size:12px;color:var(--sub);">프로젝트명</div><div id="dc-name" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>
