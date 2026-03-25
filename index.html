@@ -1268,7 +1268,7 @@ function buildZoneView(models) {
   LOCATIONS.forEach(function(group){
     var gt=document.createElement('div');gt.className='zone-group-title';gt.textContent=group.group;container.appendChild(gt);
     group.zones.forEach(function(zone){
-      var zm=models.filter(function(m){return m.location===zone&&m.status==='보관중';});
+      var zm=models.filter(function(m){return m.location&&(m.location===zone||m.location.indexOf(zone+' ')==0)&&m.status==='보관중';});
       var sec=document.createElement('div');sec.className='zone-section';
       sec.style.cursor='pointer';
       var hdr=document.createElement('div');hdr.className='zone-header';
@@ -1963,7 +1963,7 @@ function exportZoneExcel() {
   var summaryRows = [['구역','보관 모델 수','EXT','INT']];
   LOCATIONS.forEach(function(group) {
     group.zones.forEach(function(zone) {
-      var zm = MODELS.filter(function(m){ return m.location===zone && m.status!=='폐기'; });
+      var zm = MODELS.filter(function(m){ return m.location&&(m.location===zone||m.location.indexOf(zone+' ')==0) && m.status!=='폐기'; });
       summaryRows.push([zone, zm.length, zm.filter(function(m){return m.type==='EXT';}).length, zm.filter(function(m){return m.type==='INT';}).length]);
     });
   });
@@ -1976,7 +1976,7 @@ function exportZoneExcel() {
   // 구역별 시트
   LOCATIONS.forEach(function(group) {
     group.zones.forEach(function(zone) {
-      var zm = MODELS.filter(function(m){ return m.location===zone && m.status!=='폐기'; });
+      var zm = MODELS.filter(function(m){ return m.location&&(m.location===zone||m.location.indexOf(zone+' ')==0) && m.status!=='폐기'; });
       var rows = [['No.','QR ID','프로젝트명','타입','소재','단계','제작회사','현재위치','품평일자']];
       zm.forEach(function(m,i){ rows.push([i+1,String(m.qrId||''),m.project||'',m.type||'',m.material||'',m.stage||'',m.company||'',m.location||'',formatDate(m.inDate)]); });
       sheets.push({name: zone.length>31?zone.substring(0,31):zone, rows: rows});
