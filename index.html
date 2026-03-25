@@ -723,13 +723,11 @@ function _loadQRLib(cb) {
 
 function openQR(mode) {
   if(mode==='register') {
-    // 등록 화면 열 때 이전 정보 초기화
     scannedQR.register = '';
     var regStat = document.getElementById('reg-qr-status');
     if(regStat){ regStat.textContent='대기중'; regStat.className='qr-status waiting'; }
     var regVal = document.getElementById('reg-qr-val');
     if(regVal) regVal.textContent='QR 코드를 스캔하세요';
-    resetForm();
     goTo('screen-register');
   }
   else if(mode==='location') goTo('screen-location');
