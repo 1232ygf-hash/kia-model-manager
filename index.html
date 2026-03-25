@@ -729,8 +729,8 @@ function openQR(mode) {
     if(regStat){ regStat.textContent='대기중'; regStat.className='qr-status waiting'; }
     var regVal = document.getElementById('reg-qr-val');
     if(regVal) regVal.textContent='QR 코드를 스캔하세요';
-    goTo('screen-register');
     resetForm();
+    goTo('screen-register');
   }
   else if(mode==='location') goTo('screen-location');
   else if(mode==='discard') {
