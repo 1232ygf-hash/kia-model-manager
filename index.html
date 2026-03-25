@@ -1402,17 +1402,8 @@ function doSearch(silent) {
       if (res.success) {
         MODELS = res.models.filter(function(m){return m.status!=='폐기';});
         var kwL=kw?kw.toLowerCase():'';
-        var isKorean = kw ? /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(kw) : false;
         var filtered = kw ? MODELS.filter(function(m){
-          var proj = String(m.project||'').toLowerCase();
-          var comp = String(m.company||'').toLowerCase();
-          var qrid = String(m.qrId||'').toLowerCase();
-          if(isKorean) {
-            return proj.includes(kwL) || comp.includes(kwL);
-          } else {
-            var compHasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(comp);
-            return proj.includes(kwL) || qrid.includes(kwL) || (!compHasKorean && comp.includes(kwL));
-          }
+          return String(m.project||'').toLowerCase().includes(kwL);
         }) : MODELS;
         renderList(filtered);
         if(!silent){if(_sb){_sb.textContent='검색';_sb.disabled=false;_sb.classList.remove('btn-loading');}}
@@ -1709,15 +1700,7 @@ function doDiscardSearch() {
       }
       var kwLower = kw.toLowerCase();
       var filtered = res.models.filter(function(m) {
-        var qrStr = String(m.qrId || '').toLowerCase();
-        var proj = String(m.project || '').toLowerCase();
-        var comp = String(m.company || '').toLowerCase();
-        var isKoreanKw = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(kw);
-        var compHasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(comp);
-        var match = isKoreanKw
-          ? (proj.includes(kwLower) || comp.includes(kwLower))
-          : (proj.includes(kwLower) || qrStr.includes(kwLower) || (!compHasKorean && comp.includes(kwLower)));
-        return m.status !== '폐기' && match;
+        return m.status !== '폐기' && String(m.project||'').toLowerCase().includes(kwLower);
       });
       if (filtered.length === 0) {
         container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--sub);">검색 결과가 없습니다</div>';
