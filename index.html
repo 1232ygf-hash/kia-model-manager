@@ -81,11 +81,20 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard',sans-serif;
 .qr-status{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;}
 
 .parking-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-end;z-index:9999;}
-.parking-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;max-height:88vh;overflow-y:auto;}
+.parking-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;max-height:92vh;overflow-y:auto;}
 .parking-handle{width:40px;height:4px;background:#E5E5EA;border-radius:2px;margin:0 auto 14px;}
 .parking-lot{background:#F2F2F7;border:2px solid #E5E5EA;border-radius:20px;padding:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.car-spot-btn{cursor:pointer;border:none;background:none;padding:0;transition:opacity 0.15s;}
-.car-spot-btn:active{opacity:0.6;}
+.car-spot-btn{cursor:pointer;border:none;background:none;padding:0;display:flex;justify-content:center;width:100%;}
+.car-spot-btn:active{opacity:0.7;}
+.car-outer{width:100%;aspect-ratio:2/3;background:#fff;border:2px solid #C7C7CC;border-radius:18px;padding:4px;position:relative;display:flex;align-items:center;justify-content:center;}
+.car-outer.sel{background:#1C1C1E;border-color:#1C1C1E;}
+.car-inner{width:100%;height:100%;background:#F8F8F8;border:1.5px solid #D1D1D6;border-radius:13px;display:flex;align-items:center;justify-content:center;}
+.car-outer.sel .car-inner{background:#3A3A3C;border-color:#555;}
+.car-mirror-l{position:absolute;left:-6px;bottom:28%;width:6px;height:10px;background:#E5E5EA;border:1.5px solid #C7C7CC;border-radius:3px 0 0 3px;}
+.car-mirror-r{position:absolute;right:-6px;bottom:28%;width:6px;height:10px;background:#E5E5EA;border:1.5px solid #C7C7CC;border-radius:0 3px 3px 0;}
+.car-outer.sel .car-mirror-l,.car-outer.sel .car-mirror-r{background:#48484A;border-color:#666;}
+.car-spot-label{font-size:16px;font-weight:700;color:#1C1C1E;font-family:'Pretendard',sans-serif;}
+.car-outer.sel .car-spot-label{color:#fff;}
 .parking-confirm{margin-top:14px;width:100%;background:#000;color:#fff;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;}
 
 .qr-status.waiting{background:var(--fill);color:#C7C7CC;}
@@ -2067,16 +2076,11 @@ var _parkingZone = '';
 var _parkingSpot = '';
 
 function carSpotSVG(label, selected) {
-  var outer = selected ? 'background:#1C1C1E;border:2px solid #1C1C1E;' : 'background:#fff;border:2px solid #C7C7CC;';
-  var inner = selected ? 'background:#3A3A3C;border:1.5px solid #555;' : 'background:#F8F8F8;border:1.5px solid #D1D1D6;';
-  var mirror = selected ? 'background:#48484A;border:1px solid #555;' : 'background:#E5E5EA;border:1px solid #C7C7CC;';
-  var textCol = selected ? 'color:#fff;' : 'color:#1C1C1E;';
-  return '<div style="' + outer + 'border-radius:16px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;position:relative;">'
-    + '<div style="' + inner + 'border-radius:12px;width:100%;height:80px;display:flex;align-items:center;justify-content:center;position:relative;">'
-    + '<span style="font-size:11px;font-weight:700;' + textCol + 'font-family:Pretendard,sans-serif;">' + label + '</span>'
-    + '<div style="' + mirror + 'position:absolute;left:-8px;bottom:18px;width:8px;height:14px;border-radius:3px 0 0 3px;"></div>'
-    + '<div style="' + mirror + 'position:absolute;right:-8px;bottom:18px;width:8px;height:14px;border-radius:0 3px 3px 0;"></div>'
-    + '</div>'
+  var sel = selected ? ' sel' : '';
+  return '<div class="car-outer' + sel + '" id="car-spot-' + label + '">'
+    + '<div class="car-inner"><span class="car-spot-label">' + label + '</span></div>'
+    + '<div class="car-mirror-l"></div>'
+    + '<div class="car-mirror-r"></div>'
     + '</div>';
 }
 
@@ -2093,8 +2097,9 @@ function openParkingOverlay(zone) {
     btn.className = 'car-spot-btn';
     btn.innerHTML = carSpotSVG(spot, false);
     btn.onclick = function() {
-      var btns = grid.querySelectorAll('.car-spot-btn');
-      spots.forEach(function(s, i) { btns[i].innerHTML = carSpotSVG(s, s === spot); });
+      grid.querySelectorAll('.car-outer').forEach(function(c){ c.classList.remove('sel'); });
+      var el = document.getElementById('car-spot-' + spot);
+      if(el) el.classList.add('sel');
       _parkingSpot = spot;
     };
     grid.appendChild(btn);
