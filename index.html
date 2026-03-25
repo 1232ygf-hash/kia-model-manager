@@ -729,6 +729,7 @@ function openQR(mode) {
     var regVal = document.getElementById('reg-qr-val');
     if(regVal) regVal.textContent='QR 코드를 스캔하세요';
     goTo('screen-register');
+    setTimeout(function(){ resetForm(); }, 50);
   }
   else if(mode==='location') goTo('screen-location');
   else if(mode==='discard') {
