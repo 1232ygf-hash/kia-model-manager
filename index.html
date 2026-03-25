@@ -1631,6 +1631,13 @@ goTo = function(id) {
 
 window.addEventListener('popstate', function(e) {
   e.preventDefault();
+  // 주차 팝업 열려있으면 먼저 닫기
+  var parkingOverlay = document.getElementById('parking-overlay');
+  if (parkingOverlay && parkingOverlay.style.display !== 'none') {
+    parkingOverlay.style.display = 'none';
+    history.pushState(null, '', location.href);
+    return;
+  }
   if (screenHistory.length > 1) {
     screenHistory.pop();
     var prev = screenHistory[screenHistory.length-1];
