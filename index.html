@@ -1402,8 +1402,17 @@ function doSearch(silent) {
       if (res.success) {
         MODELS = res.models.filter(function(m){return m.status!=='폐기';});
         var kwL=kw?kw.toLowerCase():'';
+        var isKorean = kw ? /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(kw) : false;
         var filtered = kw ? MODELS.filter(function(m){
-          return m.project.toLowerCase().includes(kwL)||m.company.toLowerCase().includes(kwL)||String(m.qrId||'').toLowerCase().includes(kwL);
+          var proj = String(m.project||'').toLowerCase();
+          var comp = String(m.company||'').toLowerCase();
+          var qrid = String(m.qrId||'').toLowerCase();
+          if(isKorean) {
+            return proj.includes(kwL) || comp.includes(kwL);
+          } else {
+            var compHasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(comp);
+            return proj.includes(kwL) || qrid.includes(kwL) || (!compHasKorean && comp.includes(kwL));
+          }
         }) : MODELS;
         renderList(filtered);
         if(!silent){if(_sb){_sb.textContent='검색';_sb.disabled=false;_sb.classList.remove('btn-loading');}}
