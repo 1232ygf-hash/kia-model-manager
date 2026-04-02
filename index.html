@@ -582,7 +582,9 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbz0uYwY-zUO9zcshwozxpfyXoWW6GCP9l_2-5klcVzDSCWtwYNflqUcwxokcuzokbuZAg/exec';
 
 // JSONP로 GAS 호출 (CORS 우회)
-function _gasCall(funcName, args, onSuccess, onFail) {
+function _gasCall(funcName, args, onSuccess, onFail, _retryCount) {
+  var retry = _retryCount || 0;
+  var maxRetry = 2; // 최대 2회 재시도
   var cbName = '_gasCb_' + funcName + '_' + Date.now();
   var url = GAS_URL + '?func=' + encodeURIComponent(funcName) +
     '&params=' + encodeURIComponent(JSON.stringify(args)) +
@@ -591,7 +593,11 @@ function _gasCall(funcName, args, onSuccess, onFail) {
   var timer = setTimeout(function() {
     delete window[cbName];
     if (script.parentNode) script.parentNode.removeChild(script);
-    if (onFail) onFail(new Error('timeout'));
+    if (retry < maxRetry) {
+      setTimeout(function() { _gasCall(funcName, args, onSuccess, onFail, retry + 1); }, 1000);
+    } else {
+      if (onFail) onFail(new Error('timeout'));
+    }
   }, 15000);
   window[cbName] = function(data) {
     clearTimeout(timer);
