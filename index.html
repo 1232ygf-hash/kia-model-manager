@@ -749,38 +749,15 @@ function openQR(mode) {
     goTo('screen-register');
   }
   else if(mode==='location') {
-    // 이전 상태 초기화
-    scannedQR.location = '';
-    selectedLocation = '';
-    // QR 상태 초기화
-    var locStat = document.getElementById('loc-qr-status');
-    if(locStat){ locStat.textContent='대기중'; locStat.className='qr-status waiting'; }
-    var locVal = document.getElementById('loc-qr-val');
-    if(locVal) locVal.textContent='QR 코드를 스캔하세요';
-    // 모델 정보 카드 숨기기
-    var locInfo = document.getElementById('loc-model-info');
-    if(locInfo) locInfo.style.display='none';
-    // 위치 버튼 선택 초기화
-    document.querySelectorAll('.loc-btn').forEach(function(b){
-      b.classList.remove('selected');
-      b.style.borderColor='';
-      b.style.background='';
-      b.style.color='';
-    });
-    // 외부 반출 입력창 초기화
-    var expWrap = document.getElementById('export-input-wrap');
-    if(expWrap) expWrap.style.display='none';
-    var expInput = document.getElementById('export-location-text');
-    if(expInput) expInput.value='';
-    // 등록 버튼 초기화
-    var locBtn = document.getElementById('loc-submit-btn');
-    if(locBtn){ locBtn.textContent='디자인 모델 위치 등록'; locBtn.disabled=false; locBtn.classList.remove('btn-loading'); }
-    // 최신 모델 목록 로드 (중복 위치 체크용)
-    _gasCall('getAllModels', [], function(res) {
-      if(res && res.success) {
-        MODELS = res.models.filter(function(m){ return m.status !== '폐기'; });
-      }
-    }, function(){});
+    scannedQR.location = ''; selectedLocation = '';
+    var locStat=document.getElementById('loc-qr-status'); if(locStat){locStat.textContent='대기중';locStat.className='qr-status waiting';}
+    var locVal=document.getElementById('loc-qr-val'); if(locVal)locVal.textContent='QR 코드를 스캔하세요';
+    var locInfo=document.getElementById('loc-model-info'); if(locInfo)locInfo.style.display='none';
+    document.querySelectorAll('.loc-btn').forEach(function(b){b.classList.remove('selected');b.style.borderColor='';b.style.background='';b.style.color='';});
+    var expWrap=document.getElementById('export-input-wrap'); if(expWrap)expWrap.style.display='none';
+    var expInput=document.getElementById('export-location-text'); if(expInput)expInput.value='';
+    var locBtn=document.getElementById('loc-submit-btn'); if(locBtn){locBtn.textContent='디자인 모델 위치 등록';locBtn.disabled=false;locBtn.classList.remove('btn-loading');}
+    _gasCall('getAllModels',[],function(res){if(res&&res.success){MODELS=res.models.filter(function(m){return m.status!=='폐기';});}},function(){});
     goTo('screen-location');
   }
   else if(mode==='discard') {
@@ -1530,21 +1507,16 @@ function submitLocation() {
   if (!selectedLocation)   { showToast('❌ 보관 위치를 선택해주세요'); return; }
   var _locBtn = document.getElementById('loc-submit-btn');
   if(_locBtn){_locBtn.textContent='위치 등록 중...';_locBtn.disabled=true;_locBtn.classList.add('btn-loading');}
-  _gasCall('updateLocation', [scannedQR.location, selectedLocation, currentUser],
-    function(res) {
+  _gasCall('updateLocation',[scannedQR.location,selectedLocation,currentUser],
+    function(res){
       if(res.success){
         if(_locBtn){_locBtn.textContent='등록 완료 ✅';_locBtn.classList.remove('btn-loading');}
         showToast('📍 '+res.message);
-        // 모델 정보 현재위치 업데이트
-        var _locEl = document.getElementById('loc-m-loc');
-        if(_locEl) _locEl.textContent = '📍 ' + selectedLocation;
-        // 1초 후 홈으로 자동 이동
+        var _locEl=document.getElementById('loc-m-loc'); if(_locEl)_locEl.textContent='📍 '+selectedLocation;
         setTimeout(function(){
           if(_locBtn){_locBtn.textContent='디자인 모델 위치 등록';_locBtn.disabled=false;_locBtn.classList.remove('btn-loading');}
-          stopQR('location');
-          goTo('screen-home');
-          loadStats();
-        }, 1000);
+          stopQR('location'); goTo('screen-home'); loadStats();
+        },1000);
       } else {
         if(_locBtn){_locBtn.textContent='디자인 모델 위치 등록';_locBtn.disabled=false;_locBtn.classList.remove('btn-loading');}
         showToast('❌ '+res.message);
@@ -1718,16 +1690,12 @@ window.addEventListener('popstate', function(e) {
   if (screenHistory.length > 1) {
     screenHistory.pop();
     var prev = screenHistory[screenHistory.length-1];
-    // 로그인 화면으로는 백버튼으로 못 돌아가게 차단
     if (prev === 'screen-login') {
       screenHistory = ['screen-home'];
       history.pushState(null, '', location.href);
       return;
     }
-    stopQR('register');
-    stopQR('location');
-    stopQR('discard');
-    stopQR('qrsearch');
+    stopQR('register'); stopQR('location'); stopQR('discard'); stopQR('qrsearch');
     _origGoTo(prev);
   }
   history.pushState(null, '', location.href);
@@ -2181,16 +2149,8 @@ function openParkingOverlay(zone) {
   _parkingZone = zone;
   _parkingSpot = '';
   document.getElementById('parking-zone-title').textContent = zone;
-  // confirm 버튼 초기화
-  var confirmBtn = document.getElementById('parking-confirm-btn');
-  if(confirmBtn){ 
-    confirmBtn.textContent='디자인 모델 위치 등록'; 
-    confirmBtn.disabled=false;
-    confirmBtn.removeAttribute('disabled');
-    confirmBtn.classList.remove('btn-loading');
-    confirmBtn.style.pointerEvents='auto';
-    confirmBtn.style.opacity='1';
-  }
+  var confirmBtn=document.getElementById('parking-confirm-btn');
+  if(confirmBtn){confirmBtn.textContent='디자인 모델 위치 등록';confirmBtn.disabled=false;confirmBtn.removeAttribute('disabled');confirmBtn.classList.remove('btn-loading');confirmBtn.style.pointerEvents='auto';}
   var grid = document.getElementById('parking-lot-grid');
   grid.innerHTML = '';
   spots.forEach(function(spot) {
@@ -2216,22 +2176,12 @@ function closeParkingOverlay(e) {
 }
 
 function confirmParkingSpot() {
-  showToast('🔍 zone:' + _parkingZone + ' spot:' + _parkingSpot);
   if (!_parkingSpot) { showToast('❌ 구역을 선택해주세요'); return; }
   var full = _parkingZone + ' ' + _parkingSpot;
-
-  // 지하 A ZONE 세부 구역만 중복 체크
-  if (_parkingZone === '지하 A ZONE' && typeof MODELS !== 'undefined' && MODELS) {
-    showToast('🔍 MODELS: ' + MODELS.length + '개 로드됨');
-    var conflict = MODELS.filter(function(m) {
-      return m.status !== '폐기' && m.location === full && m.qrId !== scannedQR.location;
-    });
-    if (conflict.length > 0) {
-      showToast('❌ ' + full + ' 에 이미 [' + conflict[0].project + '] 모델이 있습니다');
-      return;
-    }
+  if (_parkingZone === '지하 A ZONE' && typeof MODELS !== 'undefined' && MODELS && MODELS.length > 0) {
+    var conflict = MODELS.filter(function(m){return m.status!=='폐기' && m.location===full && m.qrId!==scannedQR.location;});
+    if (conflict.length > 0) { showToast('❌ '+full+' 에 이미 ['+conflict[0].project+'] 모델이 있습니다'); return; }
   }
-
   // 위치 선택 반영
   document.querySelectorAll('.loc-btn').forEach(function(b){b.classList.remove('selected');});
   document.querySelectorAll('.loc-btn').forEach(function(b){ if(b.textContent.trim()===_parkingZone) b.classList.add('selected'); });
@@ -2275,7 +2225,7 @@ document.getElementById('reg-date').valueAsDate=new Date();
     <div style="font-size:16px;font-weight:700;margin-bottom:4px;" id="parking-zone-title"></div>
     <div style="font-size:12px;color:#8E8E93;margin-bottom:12px;">모델이 위치한 구역을 선택해주세요</div>
     <div class="parking-lot" id="parking-lot-grid"></div>
-    <button class="parking-confirm" id="parking-confirm-btn" onclick="confirmParkingSpot()" style="pointer-events:auto;opacity:1;">디자인 모델 위치 등록</button>
+    <button class="parking-confirm" id="parking-confirm-btn" onclick="confirmParkingSpot()">디자인 모델 위치 등록</button>
   </div>
 </div>
 
