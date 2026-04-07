@@ -775,6 +775,12 @@ function openQR(mode) {
     // 등록 버튼 초기화
     var locBtn = document.getElementById('loc-submit-btn');
     if(locBtn){ locBtn.textContent='디자인 모델 위치 등록'; locBtn.disabled=false; locBtn.classList.remove('btn-loading'); }
+    // 최신 모델 목록 로드 (중복 위치 체크용)
+    _gasCall('getAllModels', [], function(res) {
+      if(res && res.success) {
+        MODELS = res.models.filter(function(m){ return m.status !== '폐기'; });
+      }
+    }, function(){});
     goTo('screen-location');
   }
   else if(mode==='discard') {
@@ -2205,6 +2211,17 @@ function closeParkingOverlay(e) {
 function confirmParkingSpot() {
   if (!_parkingSpot) { showToast('❌ 구역을 선택해주세요'); return; }
   var full = _parkingZone + ' ' + _parkingSpot;
+
+  // 지하 A ZONE 세부 구역만 중복 체크
+  if (_parkingZone === '지하 A ZONE' && typeof MODELS !== 'undefined' && MODELS) {
+    var conflict = MODELS.filter(function(m) {
+      return m.status !== '폐기' && m.location === full && m.qrId !== scannedQR.location;
+    });
+    if (conflict.length > 0) {
+      showToast('❌ ' + full + ' 에 이미 [' + conflict[0].project + '] 모델이 있습니다');
+      return;
+    }
+  }
 
   // 위치 선택 반영
   document.querySelectorAll('.loc-btn').forEach(function(b){b.classList.remove('selected');});
