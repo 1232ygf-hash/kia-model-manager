@@ -2209,6 +2209,7 @@ function closeParkingOverlay(e) {
 }
 
 function confirmParkingSpot() {
+  showToast('🔍 zone:' + _parkingZone + ' spot:' + _parkingSpot);
   if (!_parkingSpot) { showToast('❌ 구역을 선택해주세요'); return; }
   var full = _parkingZone + ' ' + _parkingSpot;
 
