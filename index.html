@@ -2214,6 +2214,7 @@ function confirmParkingSpot() {
 
   // 지하 A ZONE 세부 구역만 중복 체크
   if (_parkingZone === '지하 A ZONE' && typeof MODELS !== 'undefined' && MODELS) {
+    showToast('🔍 MODELS: ' + MODELS.length + '개 로드됨');
     var conflict = MODELS.filter(function(m) {
       return m.status !== '폐기' && m.location === full && m.qrId !== scannedQR.location;
     });
