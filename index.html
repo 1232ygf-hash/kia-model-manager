@@ -2156,15 +2156,21 @@ function openParkingOverlay(zone) {
   spots.forEach(function(spot) {
     var btn = document.createElement('button');
     btn.className = 'car-spot-btn';
+    btn.setAttribute('data-spot', spot);
     btn.innerHTML = carSpotSVG(spot, false);
-    btn.onclick = function() {
-      grid.querySelectorAll('.car-outer').forEach(function(c){ c.classList.remove('sel'); });
-      var el = document.getElementById('car-spot-' + spot);
-      if(el) el.classList.add('sel');
-      _parkingSpot = spot;
-    };
     grid.appendChild(btn);
   });
+  // 이벤트 위임 - grid에 한번만 등록
+  grid.onclick = function(e) {
+    var btn = e.target.closest('.car-spot-btn');
+    if (!btn) return;
+    var spot = btn.getAttribute('data-spot');
+    if (!spot) return;
+    grid.querySelectorAll('.car-outer').forEach(function(c){ c.classList.remove('sel'); });
+    var el = document.getElementById('car-spot-' + spot);
+    if(el) el.classList.add('sel');
+    _parkingSpot = spot;
+  };
   document.getElementById('parking-overlay').style.display = 'flex';
   return true;
 }
