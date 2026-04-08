@@ -2382,7 +2382,18 @@ function openParkingOverlay(zone) {
     if (!btn) return;
     var spot = btn.getAttribute('data-spot');
     if (!spot) return;
-    grid.querySelectorAll('.car-outer').forEach(function(c){ c.classList.remove('sel'); });
+    // 점유된 스팟은 sel 유지, 선택용(비어있는) 스팟만 sel 해제
+    grid.querySelectorAll('.car-spot-btn').forEach(function(b) {
+      var s = b.getAttribute('data-spot');
+      var full = zone + ' ' + s;
+      var isOccupied = (typeof MODELS !== 'undefined' && MODELS)
+        ? MODELS.some(function(m){ return m.status !== '폐기' && m.location === full; })
+        : false;
+      if (!isOccupied) {
+        var outer = b.querySelector('.car-outer');
+        if (outer) outer.classList.remove('sel');
+      }
+    });
     var el = document.getElementById('car-spot-' + spot);
     if(el) el.classList.add('sel');
     _parkingSpot = spot;
