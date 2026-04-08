@@ -211,7 +211,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
 
 <div id="loading-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);z-index:9998;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(4px);">
   <div style="width:36px;height:36px;border:2.5px solid #E5E5EA;border-top-color:#000;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
-  <div style="font-size:13px;font-weight:500;color:#8E8E93;">처리중...</div>
+  <div id="loading-msg" style="font-size:13px;font-weight:500;color:#8E8E93;">처리중...</div>
 </div>
 <div id="toast" class="toast"></div>
 
@@ -732,6 +732,23 @@ var LOCATIONS = [
 var ALL_ZONES = LOCATIONS.reduce(function(acc,g){return acc.concat(g.zones);},[]);;
 var MODELS=[],isAdmin=true,userRole='관리자',currentUser='',currentScreen='screen-login'; // userRole: '관리자'|'일반'|'게스트'
 var _qrCache=null;
+var _isProcessing = false; // 처리중 플래그
+
+function _setProcessing(on) {
+  _isProcessing = on;
+  var overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.style.display = on ? 'flex' : 'none';
+}
+
+var _isProcessing = false; // 처리중 플래그
+
+function _setProcessing(on) {
+  _isProcessing = on;
+  var overlay = document.getElementById('loading-overlay');
+  var msg = document.getElementById('loading-msg');
+  if (overlay) overlay.style.display = on ? 'flex' : 'none';
+  if (msg) msg.textContent = on ? '처리 중... 잠시만 기다려주세요' : '처리중...';
+}
 function fetchRegisteredQRs(cb){if(_qrCache!==null){cb(_qrCache);return;}google.script.run.withSuccessHandler(function(res){_qrCache=(res&&res.models)?res.models.map(function(m){return m.qrId;}):[];cb(_qrCache);}).withFailureHandler(function(){cb([]);}).getAllModels();}
 function invalidateQRCache(){_qrCache=null;_clearModelsCache();MODELS=[];}
 // 날짜포맷
@@ -1704,12 +1721,15 @@ function renderList(models) {
 
 
 function submitLocation() {
+  if (_isProcessing) { showToast('⏳ 처리 중입니다. 잠시만 기다려주세요'); return; }
   if (!scannedQR.location) { showToast('❌ QR 코드를 스캔해주세요'); return; }
   if (!selectedLocation)   { showToast('❌ 보관 위치를 선택해주세요'); return; }
+  _setProcessing(true);
   var _locBtn = document.getElementById('loc-submit-btn');
   if(_locBtn){_locBtn.textContent='위치 등록 중...';_locBtn.disabled=true;_locBtn.classList.add('btn-loading');}
   _gasCall('updateLocation',[scannedQR.location,selectedLocation,currentUser],
     function(res){
+      _setProcessing(false);
       if(res.success){
         if(_locBtn){_locBtn.textContent='등록 완료 ✅';_locBtn.classList.remove('btn-loading');}
         showToast('📍 '+res.message);
@@ -1724,6 +1744,7 @@ function submitLocation() {
       }
     },
     function(){
+      _setProcessing(false);
       if(_locBtn){_locBtn.textContent='디자인 모델 위치 등록';_locBtn.disabled=false;_locBtn.classList.remove('btn-loading');}
       showToast('❌ 위치 등록 오류');
     }
@@ -1741,6 +1762,8 @@ function confirmDiscard() {
   );
 }
 function submitDiscard() {
+  if (_isProcessing) { showToast('⏳ 처리 중입니다. 잠시만 기다려주세요'); return; }
+  _setProcessing(true);
   if (!scannedQR.discard) { showToast('❌ QR 코드를 스캔해주세요'); return; }
   var _disBtn=document.getElementById('discard-btn');
   if(_disBtn){_disBtn.textContent='폐기 중...';_disBtn.disabled=true;_disBtn.classList.add('btn-loading');}
@@ -1769,8 +1792,10 @@ function submitDiscard() {
 
 
 function submitRegister() {
+  if (_isProcessing) { showToast('⏳ 처리 중입니다. 잠시만 기다려주세요'); return; }
   var _regBtn = document.querySelector('#screen-register .submit-btn');
   var isEditMode = _regBtn && _regBtn.textContent.trim() === '정보 수정';
+  _setProcessing(true);
 
   if(_regBtn){
     _regBtn.textContent = isEditMode ? '수정 중...' : '등록 중...';
