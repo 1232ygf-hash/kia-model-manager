@@ -89,7 +89,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard',sans-serif;
 .car-spot-btn:active{opacity:0.7;}
 .car-outer{width:100%;aspect-ratio:2/3;background:#fff;border:2px solid #C7C7CC;border-radius:18px;padding:4px;position:relative;display:flex;align-items:center;justify-content:center;}
 .car-outer.sel{background:#1C1C1E;border-color:#1C1C1E;}
-.car-inner{width:100%;height:100%;background:#F8F8F8;border:1.5px solid #D1D1D6;border-radius:13px;display:flex;align-items:center;justify-content:center;}
+.car-inner{width:100%;height:100%;background:#F8F8F8;border:1.5px solid #D1D1D6;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .car-outer.sel .car-inner{background:#3A3A3C;border-color:#555;}
 .car-mirror-l{position:absolute;left:-6px;bottom:28%;width:6px;height:10px;background:#E5E5EA;border:1.5px solid #C7C7CC;border-radius:3px 0 0 3px;}
 .car-mirror-r{position:absolute;right:-6px;bottom:28%;width:6px;height:10px;background:#E5E5EA;border:1.5px solid #C7C7CC;border-radius:0 3px 3px 0;}
@@ -1401,16 +1401,16 @@ function showAZoneGrid(models) {
   spots.forEach(function(spot){
     var m = spotMap[spot];
     var occupied = !!m;
-    var sel = occupied ? ' sel' : '';
-    var label = occupied ? m.project : spot;
-    var labelStyle = occupied
-      ? 'font-size:11px;font-weight:700;color:#fff;text-align:center;word-break:break-all;line-height:1.3;padding:2px;'
-      : 'font-size:16px;font-weight:700;color:#1C1C1E;';
 
-    html += '<div onclick="onAZoneSpotClick(\'' + spot + '\')" style="cursor:' + (occupied?'pointer':'default') + ';display:flex;justify-content:center;width:100%;">';
+    html += '<div onclick="onAZoneSpotClick(\\'' + spot + '\\')" style="cursor:' + (occupied?'pointer':'default') + ';display:flex;justify-content:center;width:100%;">';
     html += '<div style="width:100%;aspect-ratio:2/3;background:' + (occupied?'#1C1C1E':'#fff') + ';border:2px solid ' + (occupied?'#1C1C1E':'#C7C7CC') + ';border-radius:18px;padding:4px;position:relative;display:flex;align-items:center;justify-content:center;">';
-    html += '<div style="width:100%;height:100%;background:' + (occupied?'#3A3A3C':'#F8F8F8') + ';border:1.5px solid ' + (occupied?'#555':'#D1D1D6') + ';border-radius:13px;display:flex;align-items:center;justify-content:center;padding:4px;">';
-    html += '<span style="' + labelStyle + '">' + label + '</span>';
+    html += '<div style="width:100%;height:100%;background:' + (occupied?'#3A3A3C':'#F8F8F8') + ';border:1.5px solid ' + (occupied?'#555':'#D1D1D6') + ';border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;gap:3px;">';
+    if (occupied) {
+      html += '<span style="font-size:13px;font-weight:800;color:#fff;text-align:center;word-break:break-all;line-height:1.2;">' + m.project + '</span>';
+      html += '<span style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.55);text-align:center;">' + spot + '</span>';
+    } else {
+      html += '<span style="font-size:16px;font-weight:700;color:#1C1C1E;">' + spot + '</span>';
+    }
     html += '</div>';
     // 사이드미러
     html += '<div style="position:absolute;left:-6px;bottom:28%;width:6px;height:10px;background:' + (occupied?'#48484A':'#E5E5EA') + ';border:1.5px solid ' + (occupied?'#666':'#C7C7CC') + ';border-radius:3px 0 0 3px;"></div>';
@@ -1419,14 +1419,15 @@ function showAZoneGrid(models) {
   });
 
   html += '</div></div>';
+  });
+
+  html += '</div></div>';
 
   // 모델 상세 팝업 (hidden)
   html += '<div id="azone-detail-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-end;" onclick="closeAZoneDetail(event)">';
   html += '<div style="background:#fff;border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;max-height:85vh;overflow-y:auto;">';
   html += '<div style="width:40px;height:4px;background:#E5E5EA;border-radius:2px;margin:0 auto 16px;"></div>';
-  html += '<div style="background:var(--fill);border-radius:12px;padding:12px 16px;margin-bottom:4px;font-size:12px;color:var(--sub);" id="azone-detail-header">조회 결과</div>';
   html += '<div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:16px;">';
-  html += '<div style="padding:14px 20px;border-bottom:1px solid var(--line);"><div style="font-size:12px;color:var(--sub);">QR코드</div><div id="azd-qrid" style="font-size:15px;font-weight:600;margin-top:2px;font-family:\'DM Mono\',monospace;"></div></div>';
   html += '<div style="padding:14px 20px;border-bottom:1px solid var(--line);"><div style="font-size:12px;color:var(--sub);">프로젝트명</div><div id="azd-project" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>';
   html += '<div style="padding:14px 20px;border-bottom:1px solid var(--line);display:flex;gap:20px;">';
   html += '<div style="flex:1;"><div style="font-size:12px;color:var(--sub);">프로젝트 단계</div><div id="azd-stage" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>';
@@ -1453,7 +1454,6 @@ function onAZoneSpotClick(spot) {
   var m = window._aZoneSpotMap && window._aZoneSpotMap[spot];
   if (!m) { showToast('빈 구역입니다'); return; }
   var _e;
-  _e=document.getElementById('azd-qrid');     if(_e)_e.textContent=m.qrId||'-';
   _e=document.getElementById('azd-project');  if(_e)_e.textContent=m.project||'-';
   _e=document.getElementById('azd-stage');    if(_e)_e.textContent=m.stage||'-';
   _e=document.getElementById('azd-type');     if(_e)_e.textContent=m.type||'-';
@@ -2238,10 +2238,19 @@ var ZONE_SPOTS = {
 var _parkingZone = '';
 var _parkingSpot = '';
 
-function carSpotSVG(label, selected) {
+function carSpotSVG(label, selected, projectName) {
   var sel = selected ? ' sel' : '';
+  var inner = '';
+  if (projectName) {
+    inner = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px;">'
+          + '<span class="car-spot-label" style="font-size:11px;font-weight:800;word-break:break-all;line-height:1.2;">' + projectName + '</span>'
+          + '<span style="font-size:9px;font-weight:400;color:rgba(255,255,255,0.55);">' + label + '</span>'
+          + '</div>';
+  } else {
+    inner = '<span class="car-spot-label">' + label + '</span>';
+  }
   return '<div class="car-outer' + sel + '" id="car-spot-' + label + '">'
-    + '<div class="car-inner"><span class="car-spot-label">' + label + '</span></div>'
+    + '<div class="car-inner">' + inner + '</div>'
     + '<div class="car-mirror-l"></div>'
     + '<div class="car-mirror-r"></div>'
     + '</div>';
@@ -2258,10 +2267,18 @@ function openParkingOverlay(zone) {
   var grid = document.getElementById('parking-lot-grid');
   grid.innerHTML = '';
   spots.forEach(function(spot) {
+    var full = zone + ' ' + spot;
+    var occupiedModel = (typeof MODELS !== 'undefined' && MODELS)
+      ? MODELS.find(function(m){ return m.status !== '폐기' && m.location === full; })
+      : null;
     var btn = document.createElement('button');
     btn.className = 'car-spot-btn';
     btn.setAttribute('data-spot', spot);
-    btn.innerHTML = carSpotSVG(spot, false);
+    if (occupiedModel) {
+      btn.innerHTML = carSpotSVG(spot, true, occupiedModel.project);
+    } else {
+      btn.innerHTML = carSpotSVG(spot, false, null);
+    }
     grid.appendChild(btn);
   });
   // 이벤트 위임 - grid에 한번만 등록
