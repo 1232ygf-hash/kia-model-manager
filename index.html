@@ -1468,9 +1468,19 @@ function buildZoneView(models) {
 }
 
 function showZoneDetail(zone, models) {
-  // 지하 A ZONE → 파킹 그리드 뷰
+  // 지하 A ZONE → 항상 최신 데이터로 파킹 그리드 뷰
   if (zone === '지하 A ZONE') {
-    showAZoneGrid(models);
+    // 캐시 무효화 후 최신 데이터로 그리기
+    _clearModelsCache();
+    _gasCall('getAllModels', [], function(res) {
+      if (res && res.success) {
+        MODELS = res.models.filter(function(m){ return m.status !== '폐기'; });
+        _saveModelsCache(MODELS);
+      }
+      showAZoneGrid(MODELS);
+    }, function() {
+      showAZoneGrid(MODELS); // 실패 시 기존 데이터로
+    });
     return;
   }
   var title = document.getElementById('zone-detail-title');
