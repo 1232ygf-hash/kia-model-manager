@@ -303,7 +303,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
     </div>
   </div>
   <div class="logout-section">
-    <button class="logout-btn" onclick="(function(){var _pw=document.getElementById('login-pw');if(_pw)_pw.value='';localStorage.removeItem('kia_session');goTo('screen-login');})()">로그아웃</button>
+    <button class="logout-btn" onclick="(function(){var _pw=document.getElementById('login-pw');if(_pw)_pw.value='';localStorage.removeItem('kia_session');_clearModelsCache();MODELS=[];goTo('screen-login');})()">로그아웃</button>
   </div>
 </div>
 
@@ -582,6 +582,84 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
 <script>
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbz0uYwY-zUO9zcshwozxpfyXoWW6GCP9l_2-5klcVzDSCWtwYNflqUcwxokcuzokbuZAg/exec';
 
+// ── 모델 캐시 헬퍼 ──────────────────────────────────────
+var _MODELS_CACHE_KEY = 'kia_models_cache';
+var _MODELS_CACHE_TS_KEY = 'kia_models_cache_ts';
+var _MODELS_CACHE_TTL = 5 * 60 * 1000; // 5분
+
+function _saveModelsCache(models) {
+  try {
+    localStorage.setItem(_MODELS_CACHE_KEY, JSON.stringify(models));
+    localStorage.setItem(_MODELS_CACHE_TS_KEY, Date.now().toString());
+  } catch(e) {}
+}
+
+function _loadModelsCache() {
+  try {
+    var ts = parseInt(localStorage.getItem(_MODELS_CACHE_TS_KEY) || '0');
+    if (Date.now() - ts > _MODELS_CACHE_TTL) return null;
+    var raw = localStorage.getItem(_MODELS_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function _clearModelsCache() {
+  localStorage.removeItem(_MODELS_CACHE_KEY);
+  localStorage.removeItem(_MODELS_CACHE_TS_KEY);
+}
+
+// GAS 웜업 (콜드스타트 방지)
+function _warmupGAS() {
+  var cbName = '_gasCb_warmup_' + Date.now();
+  var url = GAS_URL + '?func=ping&params=[]&callback=' + cbName;
+  var s = document.createElement('script');
+  var t = setTimeout(function(){ delete window[cbName]; if(s.parentNode)s.parentNode.removeChild(s); }, 8000);
+  window[cbName] = function(){ clearTimeout(t); delete window[cbName]; if(s.parentNode)s.parentNode.removeChild(s); };
+  s.onerror = function(){ clearTimeout(t); delete window[cbName]; };
+  s.src = url;
+  document.head.appendChild(s);
+}
+// ────────────────────────────────────────────────────────
+
+// ── 모델 캐시 헬퍼 ──────────────────────────────────────
+var _MODELS_CACHE_KEY = 'kia_models_cache';
+var _MODELS_CACHE_TS_KEY = 'kia_models_cache_ts';
+var _MODELS_CACHE_TTL = 5 * 60 * 1000; // 5분
+
+function _saveModelsCache(models) {
+  try {
+    localStorage.setItem(_MODELS_CACHE_KEY, JSON.stringify(models));
+    localStorage.setItem(_MODELS_CACHE_TS_KEY, Date.now().toString());
+  } catch(e) {}
+}
+
+function _loadModelsCache() {
+  try {
+    var ts = parseInt(localStorage.getItem(_MODELS_CACHE_TS_KEY) || '0');
+    if (Date.now() - ts > _MODELS_CACHE_TTL) return null;
+    var raw = localStorage.getItem(_MODELS_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function _clearModelsCache() {
+  localStorage.removeItem(_MODELS_CACHE_KEY);
+  localStorage.removeItem(_MODELS_CACHE_TS_KEY);
+}
+
+// GAS 웜업 (콜드스타트 방지 - 앱 로드 시 ping)
+function _warmupGAS() {
+  var cbName = '_gasCb_warmup_' + Date.now();
+  var url = GAS_URL + '?func=ping&params=[]&callback=' + cbName;
+  var s = document.createElement('script');
+  var t = setTimeout(function(){ delete window[cbName]; if(s.parentNode)s.parentNode.removeChild(s); }, 8000);
+  window[cbName] = function(){ clearTimeout(t); delete window[cbName]; if(s.parentNode)s.parentNode.removeChild(s); };
+  s.onerror = function(){ clearTimeout(t); delete window[cbName]; };
+  s.src = url;
+  document.head.appendChild(s);
+}
+// ────────────────────────────────────────────────────────
+
 // JSONP로 GAS 호출 (CORS 우회)
 function _gasCall(funcName, args, onSuccess, onFail, _retryCount) {
   var retry = _retryCount || 0;
@@ -655,7 +733,7 @@ var ALL_ZONES = LOCATIONS.reduce(function(acc,g){return acc.concat(g.zones);},[]
 var MODELS=[],isAdmin=true,userRole='관리자',currentUser='',currentScreen='screen-login'; // userRole: '관리자'|'일반'|'게스트'
 var _qrCache=null;
 function fetchRegisteredQRs(cb){if(_qrCache!==null){cb(_qrCache);return;}google.script.run.withSuccessHandler(function(res){_qrCache=(res&&res.models)?res.models.map(function(m){return m.qrId;}):[];cb(_qrCache);}).withFailureHandler(function(){cb([]);}).getAllModels();}
-function invalidateQRCache(){_qrCache=null;}
+function invalidateQRCache(){_qrCache=null;_clearModelsCache();MODELS=[];}
 // 날짜포맷
 function formatDate(v){if(!v)return '-';var s=String(v);if(s.indexOf('T')!==-1)return s.split('T')[0];return s.length>10?s.substring(0,10):s;}
 // 카메라 권한 미리요청
@@ -1144,20 +1222,42 @@ function setupHome() {
 }
 
 function loadStats() {
-  // MODELS 캐시가 있으면 로컬 계산 (서버 호출 없음)
+  // 1) 메모리 캐시 있으면 즉시 표시
   if (MODELS && MODELS.length > 0) {
     _updateStatsUI();
+    // 백그라운드 갱신 (5분 지났으면)
+    var ts = parseInt(localStorage.getItem(_MODELS_CACHE_TS_KEY) || '0');
+    if (Date.now() - ts > _MODELS_CACHE_TTL) {
+      _fetchAllModelsAndCache(false);
+    }
     return;
   }
-  // 없으면 getAllModels로 한번에 가져와서 캐시
+  // 2) localStorage 캐시 있으면 즉시 표시 후 백그라운드 갱신
+  var cached = _loadModelsCache();
+  if (cached && cached.length > 0) {
+    MODELS = cached;
+    _updateStatsUI();
+    _fetchAllModelsAndCache(false);
+    return;
+  }
+  // 3) 캐시 없으면 서버에서 가져오기
+  _fetchAllModelsAndCache(true);
+}
+
+function _fetchAllModelsAndCache(showLoading) {
+  if (showLoading) showLoading(true);
   google.script.run
     .withSuccessHandler(function(res) {
+      if (showLoading) showLoading(false);
       if(res && res.success) {
         MODELS = res.models.filter(function(m){ return m.status !== '폐기'; });
+        _saveModelsCache(MODELS);
         _updateStatsUI();
       }
     })
-    .withFailureHandler(function(){})
+    .withFailureHandler(function(){
+      if (showLoading) showLoading(false);
+    })
     .getAllModels();
 }
 
@@ -1402,7 +1502,7 @@ function showAZoneGrid(models) {
     var m = spotMap[spot];
     var occupied = !!m;
 
-    html += '<div onclick="onAZoneSpotClick(\\'' + spot + '\\')" style="cursor:' + (occupied?'pointer':'default') + ';display:flex;justify-content:center;width:100%;">';
+    html += '<div onclick="onAZoneSpotClick(\"' + spot + '\"' + ')" style="cursor:' + (occupied?'pointer':'default') + ';display:flex;justify-content:center;width:100%;">';
     html += '<div style="width:100%;aspect-ratio:2/3;background:' + (occupied?'#1C1C1E':'#fff') + ';border:2px solid ' + (occupied?'#1C1C1E':'#C7C7CC') + ';border-radius:18px;padding:4px;position:relative;display:flex;align-items:center;justify-content:center;">';
     html += '<div style="width:100%;height:100%;background:' + (occupied?'#3A3A3C':'#F8F8F8') + ';border:1.5px solid ' + (occupied?'#555':'#D1D1D6') + ';border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;gap:3px;">';
     if (occupied) {
@@ -1416,9 +1516,6 @@ function showAZoneGrid(models) {
     html += '<div style="position:absolute;left:-6px;bottom:28%;width:6px;height:10px;background:' + (occupied?'#48484A':'#E5E5EA') + ';border:1.5px solid ' + (occupied?'#666':'#C7C7CC') + ';border-radius:3px 0 0 3px;"></div>';
     html += '<div style="position:absolute;right:-6px;bottom:28%;width:6px;height:10px;background:' + (occupied?'#48484A':'#E5E5EA') + ';border:1.5px solid ' + (occupied?'#666':'#C7C7CC') + ';border-radius:0 3px 3px 0;"></div>';
     html += '</div></div>';
-  });
-
-  html += '</div></div>';
   });
 
   html += '</div></div>';
@@ -2196,6 +2293,9 @@ function showLoading(show){document.getElementById('loading-overlay').style.disp
   if(savedId && idEl) idEl.value = savedId;
   if(savedId && checkEl) checkEl.checked = true;
 
+  // GAS 웜업 (콜드스타트 방지)
+  _warmupGAS();
+
   // 자동 로그인 체크 (오늘 날짜 세션 있으면)
   try {
     var session = JSON.parse(localStorage.getItem('kia_session'));
@@ -2205,22 +2305,17 @@ function showLoading(show){document.getElementById('loading-overlay').style.disp
       currentUser = session.name;
       setupHome();
       goTo('screen-home');
-      loadStats();
+      // localStorage 캐시 즉시 로드
+      var cached = _loadModelsCache();
+      if (cached && cached.length > 0) {
+        MODELS = cached;
+        _updateStatsUI();
+        // 백그라운드 갱신
+        _fetchAllModelsAndCache(false);
+      } else {
+        loadStats();
+      }
       requestCameraPermission();
-      // 백그라운드에서 모델 데이터 미리 캐시
-      setTimeout(function(){
-        if (!MODELS || MODELS.length === 0) {
-          google.script.run
-            .withSuccessHandler(function(res){
-              if(res && res.success) {
-                MODELS = res.models.filter(function(m){ return m.status !== '폐기'; });
-                _updateStatsUI();
-              }
-            })
-            .withFailureHandler(function(){})
-            .getAllModels();
-        }
-      }, 500);
       return;
     }
   } catch(e) {}
