@@ -316,7 +316,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
   </div>
   <div class="content">
     <div class="qr-scanner-area"><div id="qr-reader"></div>
-      <div class="qr-info-bar"><div class="qr-info-bar-text"><span class="qr-id" id="reg-qr-val">QR 코드를 스캔하세요</span><span class="qr-status waiting" id="reg-qr-status">대기중</span></div><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
+      <div class="qr-info-bar"><div class="qr-info-bar-text"><span class="qr-id" id="reg-qr-val">QR 코드를 스캔하세요</span><span class="qr-status waiting" id="reg-qr-status">대기중</span></div><button class="camera-flip-btn" onclick="flipCamera()" style="display:none;background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
     </div>
     <div class="form-section" style="margin-top:16px;">
       <div class="form-group-label">디자인 모델 정보</div>
@@ -363,7 +363,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
   </div>
   <div class="content">
     <div class="qr-scanner-area"><div id="qr-reader-loc"></div>
-      <div class="qr-info-bar"><div class="qr-info-bar-text"><span class="qr-id" id="loc-qr-val">모델 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="loc-qr-status">대기중</span></div><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
+      <div class="qr-info-bar"><div class="qr-info-bar-text"><span class="qr-id" id="loc-qr-val">모델 QR 코드를 스캔하세요</span><span class="qr-status waiting" id="loc-qr-status">대기중</span></div><button class="camera-flip-btn" onclick="flipCamera()" style="display:none;background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
     </div>
     <div id="loc-model-info" style="display:none;margin:12px 16px 0;">
       <div class="model-card" style="cursor:default;">
@@ -411,7 +411,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
     <!-- QR 스캔 탭 -->
     <div id="discard-qr-tab">
       <div class="qr-scanner-area"><div id="qr-reader-dis"></div>
-        <div style="padding:8px 16px;display:flex;align-items:center;gap:10px;"><span class="qr-id" id="dis-qr-val" style="flex:1;">QR 코드를 스캔하세요</span><span class="qr-status waiting" id="dis-qr-status" style="flex-shrink:0;">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
+        <div style="padding:8px 16px;display:flex;align-items:center;gap:10px;"><span class="qr-id" id="dis-qr-val" style="flex:1;">QR 코드를 스캔하세요</span><span class="qr-status waiting" id="dis-qr-status" style="flex-shrink:0;">대기중</span><button class="camera-flip-btn" onclick="flipCamera()" style="display:none;background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button></div>
       </div>
       <div id="discard-info" style="display:none;margin:16px;background:var(--card);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
         <div style="padding:14px 20px;border-bottom:1px solid var(--line);"><div style="font-size:12px;color:var(--sub);">프로젝트명</div><div id="dc-name" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>
@@ -498,7 +498,7 @@ input[type="date"].form-input-inline{color-scheme:light;text-align:right;}
             <span class="qr-id" id="qrsearch-qr-val">QR 코드를 스캔하세요</span>
             <span id="qrsearch-qr-status" class="qr-status">대기중</span>
           </div>
-          <button class="camera-flip-btn" onclick="flipCamera()" style="background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button>
+          <button class="camera-flip-btn" onclick="flipCamera()" style="display:none;background:#000;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;flex-shrink:0;">🔄 전면</button>
         </div>
       </div>
       <div id="qrsearch-result" style="display:none;background:var(--card);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;margin-top:16px;">
@@ -786,6 +786,8 @@ function openQR(mode) {
 
 function startQR(mode, elementId) {
   currentQRMode = mode;
+  // 카메라 활성화 시 전면 버튼 표시
+  document.querySelectorAll('.camera-flip-btn').forEach(function(btn){ btn.style.display='inline-block'; });
   if (qrScanners[mode]) {
     try { qrScanners[mode].stop(); } catch(e) {}
     delete qrScanners[mode];
@@ -802,6 +804,7 @@ function startQR(mode, elementId) {
     try { html5QrCode.stop(); } catch(e) {}
     delete qrScanners[mode];
     currentQRMode = null;
+    document.querySelectorAll('.camera-flip-btn').forEach(function(btn){ btn.style.display='none'; });
   };
 
   var config = { fps: 15, qrbox: function(w,h){var s=Math.round(Math.min(w,h)*0.72);return {width:s,height:s};}, experimentalFeatures:{useBarCodeDetectorIfSupported:true} };
@@ -867,6 +870,8 @@ function stopQR(mode) {
     try { qrScanners[mode].stop(); } catch(e) {}
     delete qrScanners[mode];
   }
+  // 카메라 비활성화 시 전면 버튼 숨김
+  document.querySelectorAll('.camera-flip-btn').forEach(function(btn){ btn.style.display='none'; });
 }
 
 function onQRSuccess(mode,text) {
@@ -1346,6 +1351,11 @@ function buildZoneView(models) {
 }
 
 function showZoneDetail(zone, models) {
+  // 지하 A ZONE → 파킹 그리드 뷰
+  if (zone === '지하 A ZONE') {
+    showAZoneGrid(models);
+    return;
+  }
   var title = document.getElementById('zone-detail-title');
   if(title) title.textContent = (zone && zone.indexOf('외부 반출') === 0) ? '외부 반출' : zone;
   var list = document.getElementById('zone-detail-list');
@@ -1367,6 +1377,99 @@ function showZoneDetail(zone, models) {
     list.innerHTML = h;
   }
   goTo('screen-zone-detail');
+}
+
+function showAZoneGrid(models) {
+  var title = document.getElementById('zone-detail-title');
+  if(title) title.textContent = '지하 A ZONE';
+  var list = document.getElementById('zone-detail-list');
+  if(!list) return;
+
+  var spots = ['A-7','A-8','A-9','A-4','A-5','A-6','A-1','A-2','A-3'];
+  // 스팟별 모델 매핑
+  var spotMap = {};
+  models.forEach(function(m){
+    var loc = m.location || '';
+    spots.forEach(function(s){
+      if(loc === '지하 A ZONE ' + s) spotMap[s] = m;
+    });
+  });
+
+  var html = '<div style="padding:16px;">';
+  html += '<div style="background:#F2F2F7;border:2px solid #E5E5EA;border-radius:20px;padding:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">';
+
+  spots.forEach(function(spot){
+    var m = spotMap[spot];
+    var occupied = !!m;
+    var sel = occupied ? ' sel' : '';
+    var label = occupied ? m.project : spot;
+    var labelStyle = occupied
+      ? 'font-size:11px;font-weight:700;color:#fff;text-align:center;word-break:break-all;line-height:1.3;padding:2px;'
+      : 'font-size:16px;font-weight:700;color:#1C1C1E;';
+
+    html += '<div onclick="onAZoneSpotClick(\'' + spot + '\')" style="cursor:' + (occupied?'pointer':'default') + ';display:flex;justify-content:center;width:100%;">';
+    html += '<div style="width:100%;aspect-ratio:2/3;background:' + (occupied?'#1C1C1E':'#fff') + ';border:2px solid ' + (occupied?'#1C1C1E':'#C7C7CC') + ';border-radius:18px;padding:4px;position:relative;display:flex;align-items:center;justify-content:center;">';
+    html += '<div style="width:100%;height:100%;background:' + (occupied?'#3A3A3C':'#F8F8F8') + ';border:1.5px solid ' + (occupied?'#555':'#D1D1D6') + ';border-radius:13px;display:flex;align-items:center;justify-content:center;padding:4px;">';
+    html += '<span style="' + labelStyle + '">' + label + '</span>';
+    html += '</div>';
+    // 사이드미러
+    html += '<div style="position:absolute;left:-6px;bottom:28%;width:6px;height:10px;background:' + (occupied?'#48484A':'#E5E5EA') + ';border:1.5px solid ' + (occupied?'#666':'#C7C7CC') + ';border-radius:3px 0 0 3px;"></div>';
+    html += '<div style="position:absolute;right:-6px;bottom:28%;width:6px;height:10px;background:' + (occupied?'#48484A':'#E5E5EA') + ';border:1.5px solid ' + (occupied?'#666':'#C7C7CC') + ';border-radius:0 3px 3px 0;"></div>';
+    html += '</div></div>';
+  });
+
+  html += '</div></div>';
+
+  // 모델 상세 팝업 (hidden)
+  html += '<div id="azone-detail-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-end;" onclick="closeAZoneDetail(event)">';
+  html += '<div style="background:#fff;border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;max-height:85vh;overflow-y:auto;">';
+  html += '<div style="width:40px;height:4px;background:#E5E5EA;border-radius:2px;margin:0 auto 16px;"></div>';
+  html += '<div style="background:var(--fill);border-radius:12px;padding:12px 16px;margin-bottom:4px;font-size:12px;color:var(--sub);" id="azone-detail-header">조회 결과</div>';
+  html += '<div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:16px;">';
+  html += '<div style="padding:14px 20px;border-bottom:1px solid var(--line);"><div style="font-size:12px;color:var(--sub);">QR코드</div><div id="azd-qrid" style="font-size:15px;font-weight:600;margin-top:2px;font-family:\'DM Mono\',monospace;"></div></div>';
+  html += '<div style="padding:14px 20px;border-bottom:1px solid var(--line);"><div style="font-size:12px;color:var(--sub);">프로젝트명</div><div id="azd-project" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>';
+  html += '<div style="padding:14px 20px;border-bottom:1px solid var(--line);display:flex;gap:20px;">';
+  html += '<div style="flex:1;"><div style="font-size:12px;color:var(--sub);">프로젝트 단계</div><div id="azd-stage" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>';
+  html += '<div style="flex:1;"><div style="font-size:12px;color:var(--sub);">타입</div><div id="azd-type" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>';
+  html += '<div style="flex:1;"><div style="font-size:12px;color:var(--sub);">소재</div><div id="azd-material" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>';
+  html += '</div>';
+  html += '<div style="padding:14px 20px;border-bottom:1px solid var(--line);"><div style="font-size:12px;color:var(--sub);">제작회사</div><div id="azd-company" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>';
+  html += '<div style="padding:14px 20px;border-bottom:1px solid var(--line);"><div style="font-size:12px;color:var(--sub);">보관위치</div><div id="azd-location" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>';
+  html += '<div style="padding:14px 20px;border-bottom:1px solid var(--line);"><div style="font-size:12px;color:var(--sub);">상태</div><div id="azd-status" style="font-size:15px;font-weight:600;margin-top:2px;color:var(--success);"></div></div>';
+  html += '<div style="padding:14px 20px;"><div style="font-size:12px;color:var(--sub);">품평일자</div><div id="azd-date" style="font-size:15px;font-weight:600;margin-top:2px;"></div></div>';
+  html += '</div>';
+  html += '<button onclick="document.getElementById(\'azone-detail-overlay\').style.display=\'none\';" style="width:100%;padding:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;font-size:16px;color:var(--sub);cursor:pointer;font-family:\'Pretendard\',sans-serif;">닫기</button>';
+  html += '</div></div>';
+
+  list.innerHTML = html;
+
+  // spotMap을 전역에 저장 (클릭 핸들러에서 참조)
+  window._aZoneSpotMap = spotMap;
+
+  goTo('screen-zone-detail');
+}
+
+function onAZoneSpotClick(spot) {
+  var m = window._aZoneSpotMap && window._aZoneSpotMap[spot];
+  if (!m) { showToast('빈 구역입니다'); return; }
+  var _e;
+  _e=document.getElementById('azd-qrid');     if(_e)_e.textContent=m.qrId||'-';
+  _e=document.getElementById('azd-project');  if(_e)_e.textContent=m.project||'-';
+  _e=document.getElementById('azd-stage');    if(_e)_e.textContent=m.stage||'-';
+  _e=document.getElementById('azd-type');     if(_e)_e.textContent=m.type||'-';
+  _e=document.getElementById('azd-material'); if(_e)_e.textContent=m.material||'-';
+  _e=document.getElementById('azd-company');  if(_e)_e.textContent=m.company||'-';
+  _e=document.getElementById('azd-location'); if(_e)_e.textContent=m.location||'-';
+  _e=document.getElementById('azd-status');   if(_e)_e.textContent=m.status||'보관중';
+  _e=document.getElementById('azd-date');     if(_e)_e.textContent=formatDate(m.inDate);
+  var overlay = document.getElementById('azone-detail-overlay');
+  if(overlay) overlay.style.display='flex';
+}
+
+function closeAZoneDetail(e) {
+  if(e.target === document.getElementById('azone-detail-overlay')) {
+    document.getElementById('azone-detail-overlay').style.display='none';
+  }
 }
 
 function setFilter(btn,type) {
@@ -2185,10 +2288,7 @@ function closeParkingOverlay(e) {
 function confirmParkingSpot() {
   if (!_parkingSpot) { showToast('❌ 구역을 선택해주세요'); return; }
   var full = _parkingZone + ' ' + _parkingSpot;
-  if (_parkingZone === '지하 A ZONE') {
-    if (typeof MODELS === 'undefined' || !MODELS || MODELS.length === 0) {
-      showToast('⏳ 모델 목록 로딩 중... 잠시 후 다시 시도해주세요'); return;
-    }
+  if (_parkingZone === '지하 A ZONE' && typeof MODELS !== 'undefined' && MODELS && MODELS.length > 0) {
     var conflict = MODELS.filter(function(m){return m.status!=='폐기' && m.location===full && m.qrId!==scannedQR.location;});
     if (conflict.length > 0) { showToast('❌ '+full+' 에 이미 ['+conflict[0].project+'] 모델이 있습니다'); return; }
   }
