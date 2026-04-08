@@ -1244,11 +1244,11 @@ function loadStats() {
   _fetchAllModelsAndCache(true);
 }
 
-function _fetchAllModelsAndCache(showLoading) {
-  if (showLoading) showLoading(true);
+function _fetchAllModelsAndCache(withSpinner) {
+  if (withSpinner) showLoading(true);
   google.script.run
     .withSuccessHandler(function(res) {
-      if (showLoading) showLoading(false);
+      if (withSpinner) showLoading(false);
       if(res && res.success) {
         MODELS = res.models.filter(function(m){ return m.status !== '폐기'; });
         _saveModelsCache(MODELS);
@@ -1256,7 +1256,7 @@ function _fetchAllModelsAndCache(showLoading) {
       }
     })
     .withFailureHandler(function(){
-      if (showLoading) showLoading(false);
+      if (withSpinner) showLoading(false);
     })
     .getAllModels();
 }
@@ -1502,7 +1502,7 @@ function showAZoneGrid(models) {
     var m = spotMap[spot];
     var occupied = !!m;
 
-    html += '<div onclick="onAZoneSpotClick(\"' + spot + '\"' + ')" style="cursor:' + (occupied?'pointer':'default') + ';display:flex;justify-content:center;width:100%;">';
+    html += '<div onclick="onAZoneSpotClick(\'' + spot + '\')" style="cursor:' + (occupied?'pointer':'default') + ';display:flex;justify-content:center;width:100%;">';
     html += '<div style="width:100%;aspect-ratio:2/3;background:' + (occupied?'#1C1C1E':'#fff') + ';border:2px solid ' + (occupied?'#1C1C1E':'#C7C7CC') + ';border-radius:18px;padding:4px;position:relative;display:flex;align-items:center;justify-content:center;">';
     html += '<div style="width:100%;height:100%;background:' + (occupied?'#3A3A3C':'#F8F8F8') + ';border:1.5px solid ' + (occupied?'#555':'#D1D1D6') + ';border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;gap:3px;">';
     if (occupied) {
